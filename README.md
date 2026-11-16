@@ -1,215 +1,377 @@
-# CSS-Animation
+# CSS-Animation – eine Einführung
 
-Unterrichtsbeispiele zu CSS-Animation in zwei Serien mit je zehn Szenen. Jede Szene ist eine eigene HTML-Datei, baut auf der vorigen auf und zeigt neben der Bühne eine kurze Beschreibung und die entscheidenden Codestellen.
-
-- **Serie 1 · Bouncing Ball (01–10):** die Grundlagen an einem springenden Ball – vom einfachen Übergang bis zur Grenze, an der eine JavaScript-Bibliothek sinnvoll wird.
-- **Serie 2 · UI und Dashboard (11–20):** Mikroanimationen, wie sie in Benutzeroberflächen vorkommen – Buttons, Schalter, Ladeanzeigen, Diagramme, Benachrichtigungen.
+Bewegung gehört heute zu fast jeder Benutzeroberfläche: Buttons geben beim Klicken nach, Menüs gleiten auf, Ladeanzeigen drehen sich. Vieles davon lässt sich direkt mit CSS umsetzen, ohne Skript und ohne Bibliothek. Diese Einführung erklärt, wozu Bewegung in der Gestaltung dient, mit welchen Werkzeugen CSS sie erzeugt, worauf man achten muss und wo CSS an seine Grenzen kommt.
 
 
-## Benutzung
+## 1 · Wozu Bewegung?
 
-`index.html` im Browser öffnen. Es gibt keinen Build-Schritt und keine Abhängigkeiten zum Installieren.
+Bewegung in einer Oberfläche ist kein Schmuck. Gut eingesetzt, transportiert sie Information, die ein statisches Bild nicht liefern kann.
 
-Eine Internetverbindung braucht es für:
-
-- die Schrift **Inter**, geladen von [rsms.me/inter](https://rsms.me/inter/),
-- **GSAP** in Szene 09, geladen von jsDelivr.
-
-Ohne Verbindung funktionieren die übrigen Szenen trotzdem, nur mit Ersatzschrift.
-
-### Aufbau
-
-```
-index.html              Übersicht aller Szenen
-01-transition.html …    je Szene eine Datei
-css/grundlayout.css     was in allen Szenen gleich bleibt
-```
-
-- `css/grundlayout.css` enthält Seitenlayout, Navigation, Beschreibung, Codefenster, Bühne, Horizont und Steuer-Buttons.
-- Das `<style>` jeder Szene enthält nur, was sich bewegt, und die Bewegung selbst – ausführlich kommentiert.
-- CSS ist in Kapitel gegliedert: `TYPOGRAPHY`, `COLORS`, `LAYOUT`, in den Szenen zusätzlich `ANIMATION`. Schrift, Farbe und Layout stehen nie im selben Block.
-- Nur die Grundschriftgröße steht in `rem`, alle anderen Schriftgrößen in `em`.
-- Das Codefenster rechts ist eine Kopie zum Mitlesen. Wer den Code einer Szene ändert, muss das Codefenster von Hand nachziehen.
-
-
-## Die Szenen
-
-### Serie 1 · Bouncing Ball
-
-| Nr. | Szene | Prinzip |
+| Funktion | Was sie leistet | Beispiel |
 |---|---|---|
-| 01 | transition | weicher Wechsel zwischen zwei Zuständen, Auslöser per Klick |
-| 02 | @keyframes | Bewegung ohne Auslöser; Animation gilt nur, solange sie läuft |
-| 03 | Wiederholen und Richtung | `animation-iteration-count`, `animation-direction`, Kurzschreibweise |
-| 04 | Easing | Timing-Funktionen, `cubic-bezier()`, Kurve läuft bei `alternate` rückwärts |
-| 05 | Squash and Stretch | Prozent-Keyframes, Easing je Abschnitt, `scale()` und `transform-origin` |
-| 06 | Animationen kombinieren | mehrere Elemente synchron; zwei `transform`-Animationen überschreiben sich |
-| 07 | Steuern und Endzustand | `animation-play-state`, `animation-fill-mode`, negative `animation-delay` |
-| 08 | Performance und Barrierefreiheit | Layout-Eigenschaften gegen `transform`; `prefers-reduced-motion` |
-| 09 | Grenze: CSS und GSAP | ausschwingender Sprung von Hand gegen Bibliothek mit Timeline |
-| 10 | Ausblick: Scroll | `animation-timeline: scroll()` |
+| Rückmeldung | bestätigt eine Eingabe sofort | Button gibt beim Klicken nach |
+| Zustandswechsel zeigen | macht sichtbar, was sich geändert hat und woher es kommt | Schalter gleitet von „aus“ nach „an“ |
+| Orientierung | hält den Zusammenhang, statt Inhalte springen zu lassen | Bereich klappt auf, statt plötzlich da zu sein |
+| Aufmerksamkeit lenken | zieht den Blick auf Neues oder Wichtiges | Glocke wackelt bei neuer Nachricht |
+| Wartezeit überbrücken | zeigt, dass etwas passiert, und lässt Warten kürzer wirken | Ladeanzeige, Fortschrittsbalken |
+| Daten erschließen | gibt eine Lesereihenfolge vor | Diagramm baut sich Säule für Säule auf |
+| Charakter | prägt, wie sich ein Produkt anfühlt | ruhig und sachlich oder verspielt |
 
-### Serie 2 · UI und Dashboard
+Umgekehrt gilt: Bewegung ohne Zweck lenkt ab, verlangsamt die Bedienung und kann Menschen körperlich belasten (siehe Abschnitt 7). Die erste Frage ist deshalb immer: Was soll die Bewegung mitteilen?
 
-| Nr. | Szene | Prinzip |
+
+## 2 · Zwei Werkzeuge: transition und animation
+
+CSS kennt zwei Wege, ein Element über die Zeit zu verändern.
+
+| | `transition` | `animation` |
 |---|---|---|
-| 11 | Button | `transition` auf mehrere Eigenschaften; `:hover`, `:active`, `:focus-visible` |
-| 12 | Schalter | Zustand über `:checked`, ohne Skript |
-| 13 | Akkordeon | Höhe auf „auto“ animieren über `grid-template-rows: 0fr → 1fr` |
-| 14 | Ladeindikatoren | Endlosdrehung mit `linear`, Staffelung per `animation-delay` |
-| 15 | Karte umdrehen (3D) | `perspective`, `transform-style: preserve-3d`, `backface-visibility` |
-| 16 | Fortschrittsbalken | `scaleX()` statt `width`, bestimmt und unbestimmt |
-| 17 | Ringanzeige mit Zähler | SVG `stroke-dashoffset`, Zahl über `@property` und `counter()` |
-| 18 | Analoge Uhr | Drehpunkt, `steps(60)`, Startzeit per negativer Verzögerung |
-| 19 | Benachrichtigung | Überschwingen mit `cubic-bezier()`, Animation neu starten ohne Neuladen |
-| 20 | Dashboard-Kacheln | Staffelung über Custom Properties (`--i`) |
+| Idee | weicher Wechsel zwischen zwei Zuständen | eigener Ablauf mit beliebig vielen Stufen |
+| Auslöser | nötig: ein Zustand ändert sich (`:hover`, Klasse …) | nicht nötig: startet auch von selbst |
+| Stufen | nur Start und Ziel | `@keyframes` mit beliebig vielen Zwischenstufen |
+| Wiederholung | nein | ja, auch endlos |
+| typisch für | Hover, Fokus, Aufklappen, Umschalten | Ladeanzeigen, Hinweise, Einstiegsanimationen |
+
+Faustregel: Reagiert die Bewegung auf etwas, ist es meist eine **Transition**. Läuft sie als eigener Ablauf, ist es eine **Animation**.
 
 
-## Was CSS-Animation ist
+## 3 · transition
 
-CSS kennt zwei Wege, Eigenschaften eines Elements über die Zeit zu verändern.
+Eine Transition sagt dem Browser: Wenn sich diese Eigenschaft ändert, springe nicht, sondern gleite.
 
-**`transition`** macht den Wechsel zwischen zwei Zuständen weich. Ändert sich ein Wert – etwa durch `:hover`, eine Klasse oder `:checked` –, springt er nicht, sondern gleitet über eine festgelegte Dauer zum neuen Wert. Eine Transition braucht einen Auslöser und kennt nur Start und Ziel.
+```css
+.knopf {
+  transition-property: transform;      /* welche Eigenschaft */
+  transition-duration: 0.2s;           /* wie lange */
+  transition-timing-function: ease-out;/* welcher Tempoverlauf */
+  transition-delay: 0s;                /* ab wann */
+}
+
+.knopf:hover {
+  transform: translateY(-3px);         /* Zielzustand */
+}
+```
+
+Kurzschreibweise, gleichwertig:
 
 ```css
 .knopf {
   transition: transform 0.2s ease-out;
 }
-.knopf:hover {
-  transform: translateY(-3px);
+```
+
+Wichtig:
+
+- **Die Transition gehört an den Ausgangszustand**, nicht an den Zielzustand. Dann wirkt sie in beide Richtungen: hin und zurück.
+- **Mehrere Eigenschaften** werden mit Komma getrennt, jede mit eigener Dauer:
+  `transition: transform 0.2s, background-color 0.4s;`
+- **Auslöser** sind alle Zustandswechsel: Pseudoklassen wie `:hover`, `:focus-visible`, `:active`, `:checked` – oder eine Klasse, die ein Skript setzt. Das Skript bewegt dabei nichts selbst; es schaltet nur den Zustand um.
+- `transition: all` ist bequem, animiert aber auch Eigenschaften, die man nicht im Blick hatte. Besser gezielt benennen.
+
+
+## 4 · @keyframes und animation
+
+Eine Animation besteht aus zwei Teilen: der **Beschreibung** des Ablaufs mit `@keyframes` und der **Zuweisung** an ein Element mit `animation`.
+
+```css
+/* 1. Ablauf beschreiben und benennen */
+@keyframes einblenden {
+  from { opacity: 0; transform: translateY(1em); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. Ablauf einem Element zuweisen */
+.hinweis {
+  animation-name: einblenden;
+  animation-duration: 0.5s;
 }
 ```
 
-**`animation`** spielt einen eigenen Ablauf ab, der mit `@keyframes` beschrieben wird. Er kann beliebig viele Zwischenstufen haben, sich wiederholen, rückwärts laufen und ohne Auslöser starten.
+`from` und `to` stehen für 0 % und 100 %. Dazwischen sind beliebige Prozentstufen möglich:
 
 ```css
-@keyframes drehen {
-  to { transform: rotate(360deg); }
+@keyframes wackeln {
+  0%, 100% { transform: rotate(0); }
+  25%      { transform: rotate(15deg); }
+  75%      { transform: rotate(-15deg); }
 }
+```
+
+Fehlt `from` oder `to`, nimmt der Browser den normalen Zustand des Elements. Ein `@keyframes` mit nur `to { transform: rotate(360deg); }` dreht also vom aktuellen Zustand aus.
+
+### Die Eigenschaften im Überblick
+
+| Eigenschaft | Bedeutung | Beispielwerte |
+|---|---|---|
+| `animation-name` | welche Keyframes | `einblenden` |
+| `animation-duration` | Dauer eines Durchlaufs | `0.5s`, `300ms` |
+| `animation-timing-function` | Tempoverlauf | `ease`, `linear`, `cubic-bezier(…)` |
+| `animation-delay` | Verzögerung vor dem Start; negativ = beginnt mittendrin | `1s`, `-0.5s` |
+| `animation-iteration-count` | Zahl der Durchläufe | `1`, `3`, `infinite` |
+| `animation-direction` | Richtung | `normal`, `reverse`, `alternate` |
+| `animation-fill-mode` | was vor und nach dem Ablauf gilt | `none`, `forwards`, `backwards`, `both` |
+| `animation-play-state` | läuft oder angehalten | `running`, `paused` |
+
+Zwei, die oft übersehen werden:
+
+- **`animation-fill-mode`:** Ohne Angabe gilt eine Animation nur, solange sie läuft. Danach springt das Element in seinen normalen Zustand zurück. `forwards` hält den letzten Keyframe fest.
+- **`animation-direction: alternate`:** Jeder zweite Durchlauf läuft rückwärts – einschließlich der Timing-Funktion.
+
+### Kurzschreibweise
+
+```css
 .spinner {
   animation: drehen 0.9s linear infinite;
 }
 ```
 
-Beide teilen sich die wichtigsten Stellschrauben:
-
-- **Dauer und Verzögerung** – wie lange, ab wann.
-- **Timing-Funktion (Easing)** – wie sich das Tempo über die Dauer verteilt: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`, eigene Kurven mit `cubic-bezier()`, Sprünge mit `steps()`.
-- **Animierbare Eigenschaften** – fast alles, was eine Zahl, Länge, Farbe oder Transformation ist. Am günstigsten sind `transform` und `opacity` (siehe Szene 08).
-
-Animationen bringen zusätzlich Wiederholung (`animation-iteration-count`), Richtung (`animation-direction`), Verhalten vor und nach dem Ablauf (`animation-fill-mode`) und Anhalten (`animation-play-state`) mit.
+Die Reihenfolge ist weitgehend frei. Eine Regel gilt aber: **Die erste Zeitangabe ist die Dauer, die zweite die Verzögerung.**
 
 
-## Warum CSS-Animation nützlich ist
+## 5 · Timing und Easing
 
-### In der Gestaltung von Oberflächen
+Dieselbe Bewegung wirkt völlig verschieden, je nachdem, wie sich das Tempo über die Dauer verteilt. Diesen Tempoverlauf legt die **Timing-Funktion** fest, im Englischen meist **Easing** genannt.
 
-Gut eingesetzte Bewegung ist kein Schmuck, sondern Information. Sie macht sichtbar, was gerade passiert:
+| Wert | Verlauf | wirkt | typisch für |
+|---|---|---|---|
+| `linear` | gleichmäßig | mechanisch | Drehungen, Fortschritt, Uhren |
+| `ease` | zügig an, sanft aus | natürlich, Standard | allgemeine Übergänge |
+| `ease-in` | langsam an, schnell aus | beschleunigend | Elemente, die verschwinden; Fallen |
+| `ease-out` | schnell an, langsam aus | abbremsend | Elemente, die erscheinen; Reaktion auf Klick |
+| `ease-in-out` | langsam an und aus | fließend | Bewegung von A nach B auf dem Bildschirm |
 
-- **Rückmeldung:** Ein Button, der beim Klick nachgibt, bestätigt die Eingabe sofort (Szene 11).
-- **Zustandswechsel nachvollziehbar machen:** Ein Schalter, der hinübergleitet, zeigt den neuen Zustand und woher er kommt (Szene 12). Ein Bereich, der aufklappt, statt plötzlich da zu sein, hält die Orientierung (Szene 13).
-- **Zusammenhänge zeigen:** Was von rechts hereinfährt, kann auch dorthin wieder verschwinden (Szene 19). Bewegung verbindet Ursache und Wirkung.
-- **Aufmerksamkeit lenken:** Eine wackelnde Glocke oder ein aufploppender Zähler zieht den Blick auf das, was neu ist (Szene 19).
-- **Wartezeit überbrücken:** Ladeanzeigen und Fortschrittsbalken zeigen, dass etwas passiert, und lassen Wartezeit kürzer wirken (Szenen 14, 16).
-- **Daten erfassbar machen:** Diagramme, die sich aufbauen, und Zahlen, die hochzählen, lenken das Lesen in eine Reihenfolge (Szenen 17, 20).
-- **Charakter:** Tempo und Easing prägen, wie sich eine Oberfläche anfühlt – sachlich, verspielt, hochwertig.
+Alle Schlüsselwörter außer `linear` sind Kurzformen einer **Bézierkurve**. Mit `cubic-bezier()` lassen sich eigene Kurven beschreiben:
 
-### Technisch
+```css
+transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+```
 
-- **Deklarativ und ohne Bibliothek:** Ein paar Zeilen CSS, kein zusätzliches Skript, keine Abhängigkeit.
-- **Vom Browser optimiert:** Animationen auf `transform` und `opacity` kann der Browser als fertige Ebenen verschieben, oft auf der Grafikkarte. Sie laufen dann auch flüssig, wenn JavaScript gerade beschäftigt ist.
-- **Zustände bleiben im CSS:** Ein Skript setzt höchstens eine Klasse; was dabei passiert, steht dort, wo auch das Aussehen steht.
-- **Barrierefreiheit eingebaut:** Mit der Media Query `prefers-reduced-motion` lässt sich Bewegung für Menschen reduzieren, die das im Betriebssystem eingestellt haben (Szene 08).
+Liegt ein Wert über 1, schießt die Bewegung über das Ziel hinaus und schwingt zurück – ein elastischer Effekt.
 
-### Faustregeln
+Weitere Formen:
 
-- Kurze Dauer für Rückmeldungen (etwa 100–300 ms), längere für größere Wege. Lieber zu kurz als zu lang.
-- `ease-out` für Hereinkommendes, `ease-in` für Hinausgehendes.
-- `transform` und `opacity` animieren, nicht `top`, `left`, `width` oder `height`.
-- Bewegung muss einen Zweck haben. Was nur dekoriert, darf bei reduzierter Bewegung entfallen.
-- Reduzieren heißt nicht unbedingt abschalten: Vor allem große Ortsveränderungen, Parallax und Zoom lösen Beschwerden aus.
+- **`steps(n)`** zerlegt die Bewegung in n Sprünge, z. B. für einen Sekundenzeiger oder Sprite-Animationen.
+- **`linear()`** verbindet beliebig viele Stützpunkte zu einer Kurve und erlaubt damit auch Federn und Abprallen.
 
+### Prinzipien aus dem Trickfilm
 
-## Grenzen
+Viele Regeln für glaubwürdige Bewegung stammen aus dem Zeichentrickfilm, zusammengefasst von Frank Thomas und Ollie Johnston (*The Illusion of Life*, 1981). Für Oberflächen besonders nützlich:
 
-CSS-Animation ist stark bei Zustandswechseln, Schleifen und kurzen, festen Abläufen. Schwierig wird es bei:
-
-- **Langen, verketteten Abläufen:** Mehrere Schritte nacheinander gehen nur über ausgerechnete Verzögerungen. Ändert sich ein Schritt, verschiebt sich alles dahinter.
-- **Abhängigkeiten von Daten zur Laufzeit:** Keyframes stehen fest. Werte, die erst beim Laufen feststehen, kommen nur über Custom Properties aus einem Skript (Szenen 18, 20).
-- **Physikalisch wirkender Bewegung:** Federn, Nachschwingen, Abprallen müssen von Hand in Keyframes zerlegt werden (Szene 09).
-- **Steuerung:** Pausieren geht, aber gezielt zu einer Stelle springen, rückwärts abspielen oder neu starten nur über Umwege (Szenen 07, 19).
-- **Höhe `auto` und andere Schlüsselwörter:** lassen sich klassisch nicht animieren, nur über Tricks (Szene 13) oder neuere Funktionen.
-- **Einblenden aus dem Nichts:** Ein Element, das von `display: none` kommt, hatte bisher keinen Startzustand für eine Transition.
-- **Mehrere Bewegungen auf `transform`:** Zwei Animationen auf derselben Eigenschaft überschreiben sich (Szene 06).
-
-Für solche Fälle gibt es JavaScript:
-
-- **Web Animations API** – im Browser eingebaut, ohne Bibliothek. `element.animate()` nutzt dieselben Keyframes wie CSS, lässt sich aber per Skript starten, anhalten, umkehren, beschleunigen und abwarten.
-- **Bibliotheken** – siehe nächster Abschnitt.
+- **Slow in, slow out:** Echte Körper beschleunigen und bremsen – daher Easing statt `linear`.
+- **Timing:** Die Dauer vermittelt Gewicht. Schwere Dinge bewegen sich langsamer.
+- **Squash and Stretch:** Stauchen und Strecken zeigen Elastizität, etwa bei einem aufprallenden Ball.
+- **Staging:** Immer nur eine Sache gleichzeitig in den Vordergrund stellen.
 
 
-## Bibliotheken
+## 6 · Was sich animieren lässt – und was sich lohnt
 
-**[GSAP](https://gsap.com)** (GreenSock Animation Platform) ist die verbreitetste JavaScript-Bibliothek für Animation im Web. Stärken:
+Animierbar ist fast alles, was eine Zahl, Länge, Farbe oder Transformation ist. Für flüssige Bewegung eignen sich aber vor allem zwei Eigenschaften: **`transform`** und **`opacity`**.
 
-- **Timelines:** viele Bewegungen auf einer gemeinsamen Zeitachse, verschachtelt, steuerbar (Szene 09).
-- **Easings und Plugins:** fertige Sprung- und Federkurven, `CustomBounce` mit passender Stauchung, `ScrollTrigger` für Scroll-Erzählungen, Morphen von SVG-Pfaden, Text-Effekte.
-- **Steuerung zur Laufzeit:** pausieren, zurückspulen, Tempo ändern, zu einer Stelle springen.
-- **Einheitliches Verhalten** über Browser hinweg.
+### Warum transform und opacity?
 
-GSAP ist kostenlos nutzbar, einschließlich der früher kostenpflichtigen Plugins. Es gilt eine eigene Lizenz ([gsap.com/standard-license](https://gsap.com/standard-license)); vor dem Einsatz in Projekten lesen.
+Der Browser baut eine Seite in Schritten auf:
 
-Weitere verbreitete Werkzeuge:
+1. **Layout** – Wo liegt jedes Element, wie groß ist es?
+2. **Paint** – Wie sieht jedes Element aus? Pixel werden gezeichnet.
+3. **Composite** – Die gezeichneten Ebenen werden übereinandergelegt.
 
-- **[Motion](https://motion.dev)** (früher Framer Motion) – für React und ohne Framework, baut auf der Web Animations API auf, mit Federphysik.
-- **[Anime.js](https://animejs.com)** – schlanke Bibliothek mit ähnlicher Idee wie GSAP.
-- **[Lottie](https://airbnb.io/lottie/)** – spielt Animationen ab, die in After Effects gestaltet und als JSON exportiert wurden. Typisch für Illustrationen und Icons.
+Wer `top`, `left`, `width` oder `height` animiert, zwingt den Browser bei jedem Bild durch alle drei Schritte. Bei `transform` und `opacity` reicht der letzte: Die fertige Ebene wird nur verschoben, gedreht, skaliert oder durchsichtiger gemacht – oft von der Grafikkarte, auch dann flüssig, wenn JavaScript gerade beschäftigt ist.
 
-**Wann lohnt sich eine Bibliothek?** Bei langen Abläufen, vielen koordinierten Elementen, Physik, Scroll-Inszenierung und Steuerung zur Laufzeit. Der Preis: eine zusätzliche Datei, eine Abhängigkeit von JavaScript und Einarbeitung. Für Hover, Schalter, Aufklappen und Ladeanzeigen reicht CSS.
+### Die Funktionen von transform
+
+| Funktion | Wirkung |
+|---|---|
+| `translate(x, y)` | verschieben |
+| `scale(x, y)` | vergrößern, verkleinern, verzerren |
+| `rotate(winkel)` | drehen |
+| `skew(x, y)` | schräg stellen |
+
+- **`transform-origin`** legt den Bezugspunkt fest, um den gedreht oder skaliert wird – etwa den Fuß eines Uhrzeigers.
+- **Reihenfolge zählt:** `rotate(30deg) translateX(5em)` ergibt etwas anderes als `translateX(5em) rotate(30deg)`.
+- **Achtung:** Ein Element hat nur ein `transform`. Zwei Animationen, die beide `transform` setzen, überschreiben sich. Abhilfe: ein umschließendes Element, oder die Einzeleigenschaften `translate`, `scale` und `rotate`, die sich getrennt setzen lassen.
+
+### Dreidimensional
+
+Mit `rotateX()`, `rotateY()` und `translateZ()` bewegen sich Elemente im Raum. Dazu braucht es:
+
+- **`perspective`** am Elternelement – den Abstand des Betrachters; kleine Werte verzerren stark,
+- **`transform-style: preserve-3d`** – damit Kindelemente im Raum bleiben,
+- **`backface-visibility: hidden`** – blendet die Rückseite aus, etwa bei einer Karte, die sich umdreht.
 
 
-## Neues in CSS
+## 7 · Barrierefreiheit
 
-CSS holt bei vielen Grenzen auf. Ein Teil davon ist schon überall nutzbar, ein Teil erst in einzelnen Browsern.
+Bewegung auf dem Bildschirm kann bei manchen Menschen Schwindel, Übelkeit oder Kopfschmerzen auslösen, etwa bei Störungen des Gleichgewichtssinns. Betriebssysteme bieten deshalb die Einstellung „Bewegung reduzieren“. CSS fragt sie mit einer Media Query ab:
 
-> Stand der Browserunterstützung: Herbst 2026, aus Fachwissen, nicht einzeln geprüft. Vor dem Einsatz auf [caniuse.com](https://caniuse.com) nachsehen und mit `@supports` absichern (siehe Szene 10).
+```css
+@media (prefers-reduced-motion: reduce) {
+  .hintergrund-parallax {
+    animation: none;
+  }
+}
+```
+
+Dabei gilt:
+
+- **Reduzieren heißt nicht unbedingt abschalten.** Beschwerden lösen vor allem große Ortsveränderungen aus: Bewegung quer über den Bildschirm, Parallax, Zoom. Kleine Rückmeldungen an Ort und Stelle und Überblendungen sind meist unproblematisch.
+- **Was Information trägt, bleibt** – eine Ladeanzeige läuft dann langsamer statt gar nicht.
+- **Die Regel muss greifen:** Die Selektoren in der Media Query müssen mindestens so spezifisch sein wie die, die die Animation setzen. Sonst bleibt sie wirkungslos.
+
+Die Richtlinien für barrierefreie Webinhalte (WCAG 2.2) fordern unter anderem:
+
+- **2.2.2 Pause, Stop, Hide (Stufe A):** Bewegung, die von selbst startet und länger als fünf Sekunden läuft, muss sich anhalten lassen.
+- **2.3.1 Three Flashes (Stufe A):** nichts, das mehr als dreimal pro Sekunde blitzt.
+- **2.3.3 Animation from Interactions (Stufe AAA):** Bewegung, die durch Interaktion ausgelöst wird, soll sich abschalten lassen, sofern sie nicht wesentlich ist.
+
+Außerdem: Interaktive Elemente brauchen einen sichtbaren Fokus (`:focus-visible`), auch wenn sie sich bewegen.
+
+
+## 8 · Gute Praxis
+
+- **Kurz halten.** Rückmeldungen etwa 100–300 ms, größere Wege bis etwa 500 ms. Lieber zu kurz als zu lang – niemand will auf eine Animation warten.
+- **Easing nach Richtung wählen:** `ease-out` für Hereinkommendes, `ease-in` für Hinausgehendes.
+- **`transform` und `opacity` animieren**, nicht Lage oder Größe.
+- **Einheitlich bleiben:** gleiche Dauer und gleiches Easing für gleiche Vorgänge in einem Produkt.
+- **Jede Bewegung braucht einen Zweck.** Was nur schmückt, darf bei reduzierter Bewegung entfallen.
+- **Bedienung nie blockieren:** Während einer Animation muss die Oberfläche weiter reagieren.
+
+
+## 9 · Grenzen von CSS
+
+CSS ist stark bei Zustandswechseln, Schleifen und kurzen, festen Abläufen. Schwierig wird es bei:
+
+- **langen, verketteten Abläufen** – mehrere Schritte nacheinander gehen nur über ausgerechnete Verzögerungen; ändert sich einer, verschiebt sich alles dahinter,
+- **Werten, die erst zur Laufzeit feststehen** – Keyframes sind fest; dynamische Werte kommen nur über Custom Properties aus einem Skript,
+- **physikalisch wirkender Bewegung** – Federn, Nachschwingen und Abprallen müssen von Hand in Keyframes zerlegt werden,
+- **Steuerung** – Anhalten geht, aber zu einer Stelle springen, rückwärts abspielen oder neu starten nur über Umwege,
+- **`height: auto`** und andere Schlüsselwörter – lassen sich klassisch nicht animieren, weil der Browser zwischen einer Zahl und „auto“ nicht rechnen kann,
+- **Einblenden aus `display: none`** – ein Element, das gerade erst erscheint, hat keinen Startzustand für eine Transition.
+
+Ein Teil davon wird durch neue CSS-Funktionen gelöst (Abschnitt 11). Für den Rest gibt es JavaScript.
+
+
+## 10 · JavaScript und Bibliotheken
+
+### Web Animations API
+
+Im Browser eingebaut, ohne Bibliothek. `element.animate()` nimmt Keyframes wie CSS, lässt sich aber per Skript steuern:
+
+```js
+const ablauf = ball.animate(
+  [{ transform: 'translateY(0)' }, { transform: 'translateY(144px)' }],
+  { duration: 600, easing: 'ease-in', iterations: Infinity, direction: 'alternate' }
+);
+
+ablauf.pause();
+ablauf.reverse();
+ablauf.finished.then(() => { /* fertig */ });
+```
+
+### Bibliotheken
+
+| Bibliothek | Schwerpunkt |
+|---|---|
+| [GSAP](https://gsap.com) | Timelines für lange Abläufe, fertige Easings, Scroll-Inszenierung (ScrollTrigger), SVG-Morphing, Steuerung zur Laufzeit; einheitlich in allen Browsern |
+| [Motion](https://motion.dev) | für React und ohne Framework, Federphysik, baut auf der Web Animations API auf |
+| [Anime.js](https://animejs.com) | schlanke Bibliothek mit ähnlicher Idee wie GSAP |
+| [Lottie](https://airbnb.io/lottie/) | spielt Animationen ab, die in After Effects gestaltet und als JSON exportiert wurden – für Illustrationen und Icons |
+
+GSAP ist die verbreitetste dieser Bibliotheken und heute kostenlos nutzbar, einschließlich der früher kostenpflichtigen Plugins. Es gilt eine eigene Lizenz ([gsap.com/standard-license](https://gsap.com/standard-license)), die vor dem Einsatz zu lesen ist.
+
+### Was nehme ich wofür?
+
+| Aufgabe | Werkzeug |
+|---|---|
+| Hover, Fokus, Umschalten, Aufklappen | CSS `transition` |
+| Ladeanzeige, Hinweis, Einstiegsanimation | CSS `animation` |
+| Animation per Skript starten, anhalten, umkehren | Web Animations API |
+| lange Abläufe, viele koordinierte Elemente, Physik, Scroll-Inszenierung | Bibliothek wie GSAP oder Motion |
+| aufwendige Illustration aus After Effects | Lottie |
+
+Eine Bibliothek kostet eine zusätzliche Datei, eine Abhängigkeit von JavaScript und Einarbeitung. Für die meisten Bewegungen in einer Oberfläche reicht CSS.
+
+
+## 11 · Neue Möglichkeiten in CSS
+
+CSS holt bei vielen der genannten Grenzen auf. Manches ist schon überall nutzbar, manches erst in einzelnen Browsern.
+
+> Stand: Herbst 2026, nach Fachwissen zusammengestellt und nicht einzeln geprüft. Vor dem Einsatz auf [caniuse.com](https://caniuse.com) nachsehen.
 
 ### Breit unterstützt
 
-| Funktion | Wofür | Szene |
-|---|---|---|
-| `translate`, `rotate`, `scale` als eigene Eigenschaften | einzeln animieren, ohne dass sich `transform` überschreibt | 06 (Kommentar) |
-| `@property` | Custom Properties einen Typ geben und damit animierbar machen | 17 |
-| Easing `linear()` | beliebige Kurven aus Stützpunkten, z. B. Federn und Abprallen | 09 (Kommentar) |
-| `animation-composition` | mehrere Animationen auf derselben Eigenschaft addieren statt ersetzen | – |
-| `offset-path` | Bewegung entlang eines Pfads | – |
+| Funktion | Wofür |
+|---|---|
+| `translate`, `rotate`, `scale` als eigene Eigenschaften | einzeln setzen und animieren, ohne dass sich `transform` überschreibt |
+| `@property` | einer Custom Property einen Typ geben – erst dann lässt sie sich animieren, z. B. eine hochzählende Zahl |
+| `linear()` | Easing aus beliebig vielen Stützpunkten, z. B. für Federn |
+| `animation-composition` | mehrere Animationen auf derselben Eigenschaft addieren statt ersetzen |
+| `offset-path` | Bewegung entlang eines Pfads |
 
-### Noch nicht überall
+### Noch nicht in allen Browsern
 
-| Funktion | Wofür | Szene |
-|---|---|---|
-| Scroll-gesteuerte Animation: `animation-timeline: scroll()` und `view()` | Fortschritt kommt vom Scrollen statt von der Uhr | 10 |
-| View Transitions (`document.startViewTransition()`, `@view-transition`) | weiche Übergänge zwischen Zuständen einer Seite oder zwischen Seiten | – |
-| `@starting-style` und `transition-behavior: allow-discrete` | Einblenden von Elementen, die von `display: none` kommen (Dialoge, Popovers) | – |
-| `interpolate-size` und `calc-size()` | `height: auto` direkt animieren | 13 (Kommentar) |
+| Funktion | Wofür |
+|---|---|
+| `animation-timeline: scroll()` und `view()` | Fortschritt der Animation kommt vom Scrollen statt von der Uhr |
+| View Transitions | weiche Übergänge zwischen Zuständen einer Seite oder zwischen Seiten |
+| `@starting-style` und `transition-behavior: allow-discrete` | Einblenden von Elementen, die von `display: none` kommen, etwa Dialoge |
+| `interpolate-size` und `calc-size()` | `height: auto` direkt animieren |
 
-Das Muster für alles aus der zweiten Tabelle: Die neue Funktion verbessert, wo sie da ist, und die Seite funktioniert auch ohne sie.
+Solche Funktionen setzt man als **Verbesserung** ein: Wo der Browser sie kann, wirken sie; wo nicht, funktioniert die Seite trotzdem. `@supports` prüft das:
 
 ```css
 @supports (animation-timeline: scroll()) {
-  .ball {
-    animation: fallen auto linear both;
+  .fortschritt {
+    animation: fuellen auto linear both;
     animation-timeline: scroll();
   }
 }
 ```
 
 
-## Weiterführend
+## 12 · Begriffe auf einen Blick
+
+| Begriff | Bedeutung |
+|---|---|
+| Transition | weicher Übergang zwischen zwei Zuständen, braucht einen Auslöser |
+| Animation | eigener Ablauf, beschrieben mit `@keyframes` |
+| Keyframe | festgelegter Zustand zu einem Zeitpunkt des Ablaufs |
+| Easing, Timing-Funktion | Verteilung des Tempos über die Dauer |
+| Bézierkurve | Kurve, die einen Tempoverlauf beschreibt (`cubic-bezier()`) |
+| Fill-Mode | was vor und nach einer Animation gilt |
+| `transform` | Verschieben, Skalieren, Drehen, Neigen ohne Einfluss aufs Layout |
+| `transform-origin` | Bezugspunkt einer Transformation |
+| Reflow / Layout | Neuberechnung von Lage und Größe der Elemente |
+| Repaint | Neuzeichnen von Pixeln |
+| Compositing | Übereinanderlegen fertiger Ebenen, günstig für Animation |
+| Mikroanimation | kleine, zweckgebundene Bewegung in einer Oberfläche |
+| `prefers-reduced-motion` | Media Query für die Einstellung „Bewegung reduzieren“ |
+
+
+## 13 · Fragen zur Wiederholung
+
+Eigene Übungsfragen, keine offiziellen Prüfungsaufgaben.
+
+1. Worin unterscheiden sich `transition` und `animation`? Nenne je einen typischen Einsatz.
+2. Warum steht eine Transition am Ausgangszustand und nicht am Zielzustand?
+3. Ein Element springt nach seiner Animation in die Ausgangslage zurück. Welche Eigenschaft ändert das, mit welchem Wert?
+4. Welches Easing passt zu einem Hinweis, der hereinfährt, welches zu einem, der verschwindet? Begründe.
+5. Warum sollte man `transform` statt `top` oder `width` animieren?
+6. Was bewirkt `transform-origin` bei einer Drehung?
+7. Eine Animation soll bei „Bewegung reduzieren“ nicht vollständig entfallen. Wie gehst du vor?
+8. Nenne zwei Situationen, in denen eine Bibliothek wie GSAP sinnvoller ist als reines CSS.
+9. Wie lässt sich eine neue CSS-Funktion einsetzen, ohne Browser auszuschließen, die sie noch nicht kennen?
+
+
+## 14 · Weiterführend
 
 - MDN: [CSS-Animationen verwenden](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations), [CSS-Transitions verwenden](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions)
 - MDN: [Scroll-gesteuerte Animation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations), [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API), [`@starting-style`](https://developer.mozilla.org/en-US/docs/Web/CSS/@starting-style)
 - MDN: [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API), [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
-- W3C: [WCAG 2.2 – Animation from Interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html)
-- [caniuse.com](https://caniuse.com) – Browserunterstützung
+- W3C, WCAG 2.2: [2.2.2 Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), [2.3.1 Three Flashes](https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html), [2.3.3 Animation from Interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html)
+- [caniuse.com](https://caniuse.com) – Browserunterstützung nachsehen
 - [GSAP-Dokumentation](https://gsap.com/docs/v3/)
+
+
+## Beispiele
+
+Zu allen Themen gibt es Beispiele zum Ausprobieren: `index.html` im Browser öffnen. Zwei Serien mit je zehn Szenen – ein springender Ball für die Grundlagen, typische Oberflächenelemente für die Praxis.
