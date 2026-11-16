@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>11 · Button</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    /* Buttons erben die Schrift der Seite nicht von selbst */
+    .knopf {
+      font-family: inherit;
+      font-size: 1.25em;
+      font-weight: 600;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .knopf {
+      background: #e4572e;
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(30, 30, 30, 0.2);
+    }
+
+    .knopf:hover {
+      background: #d14a23;
+      box-shadow: 0 10px 20px rgba(30, 30, 30, 0.2);
+    }
+
+    .knopf:active {
+      background: #b93f1d;
+      box-shadow: 0 1px 2px rgba(30, 30, 30, 0.2);
+    }
+
+    .knopf:focus-visible {
+      outline-color: #3d7eff;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .knopf {
+      padding: 0.8em 1.8em;
+      border-style: none;
+      border-radius: 0.5em;
+      cursor: pointer;
+    }
+
+    .knopf:focus-visible {
+      outline-style: solid;
+      outline-width: 3px;
+      outline-offset: 4px;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 11 · Button: Hover, Klick, Fokus
+       Drei Zustände, jeder mit eigener Rückmeldung.
+       Die transition steht beim Ausgangszustand und wirkt damit in beide Richtungen. */
+
+    .knopf {
+      /* mehrere Eigenschaften, jede mit eigener Dauer –
+         die Werte gehören der Reihe nach zu transition-property */
+      transition-property: transform, box-shadow, background-color;
+      transition-duration: 0.2s, 0.2s, 0.4s;
+      transition-timing-function: ease-out;
+
+      /* Kurzschreibweise, gleichwertig:
+         transition: transform 0.2s ease-out,
+                     box-shadow 0.2s ease-out,
+                     background-color 0.4s ease-out; */
+    }
+
+    /* Hover: Der Button hebt sich an, der Schatten wird größer (siehe COLORS) */
+    .knopf:hover {
+      transform: translateY(-3px);
+    }
+
+    /* Klick: Der Button wird eingedrückt. Die kürzere Dauer gilt nur,
+       solange er gedrückt ist – so fühlt sich der Klick direkt an. */
+    .knopf:active {
+      transform: translateY(1px) scale(0.98);
+      transition-duration: 0.05s;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="10-scroll-ausblick.html" rel="prev" aria-label="Vorherige Szene: 10 · Ausblick: Scroll"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 10</a>
+      <a href="12-schalter.html" rel="next" aria-label="Nächste Szene: 12 · Schalter">12 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <button class="knopf" type="button">Speichern</button>
+    </div>
+
+    <section class="beschreibung">
+      <h1>11 · Button</h1>
+      <h2>Was passiert</h2>
+      <p>Ein Button reagiert auf drei Zustände: Unter dem Mauszeiger hebt er sich an und sein Schatten wächst, beim Klicken wird er eingedrückt, per Tastatur bekommt er einen Fokusrahmen.</p>
+      <h2>Neu gegenüber 10</h2>
+      <p>Beginn der zweiten Serie: Bewegung in der Benutzeroberfläche. Eine <code>transition</code> kann mehrere Eigenschaften zugleich weich wechseln, jede mit eigener Dauer. Die Auslöser liefern die Pseudoklassen <code>:hover</code>, <code>:active</code> und <code>:focus-visible</code> – ganz ohne Skript, anders als in 01.</p>
+      <h2>Bedienung</h2>
+      <p>Maus über den Button, klicken, oder mit Tab ansteuern.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.knopf</span> {
+  <span class="c-eigenschaft">transition-property</span>: <span class="c-wert">transform, box-shadow,
+                       background-color</span>;
+  <span class="c-eigenschaft">transition-duration</span>: <span class="c-wert">0.2s, 0.2s, 0.4s</span>;
+  <span class="c-eigenschaft">transition-timing-function</span>: <span class="c-wert">ease-out</span>;
+}
+
+<span class="c-selektor">.knopf:hover</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(-3px)</span>;
+}
+
+<span class="c-selektor">.knopf:active</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(1px) scale(0.98)</span>;
+  <span class="c-eigenschaft">transition-duration</span>: <span class="c-wert">0.05s</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>08 · Performance und Barrierefreiheit</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+    .schatten {
+      background: #1e1e1e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    /* Bahn: trägt Ball und Schatten einer Hälfte und bewegt beide zur Seite */
+    .bahn {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 360px;
+      z-index: 1;            /* vor dem Horizont */
+    }
+
+    .ball {
+      /* Ausgangslage: mittig in der Hälfte, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 148px;           /* (360 - 64) / 2 */
+      z-index: 1;            /* vor dem Schatten */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+    /* Schatten: flache Ellipse auf dem Boden, genau unter dem Aufsetzpunkt (336px) */
+    .schatten {
+      position: absolute;
+      top: 330px;
+      left: 148px;
+      width: 64px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .bahn-layout    { left: 0; }
+    .bahn-transform { left: 360px; }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 08 · Performance und Barrierefreiheit
+       Zweimal dieselbe Szene wie in 06: Ball mit Squash and Stretch, Schatten, Bahn.
+       Sichtbar gleich, technisch verschieden:
+       links über Lage- und Größeneigenschaften, rechts nur über transform und opacity.
+       Den Unterschied zeigt der Rendering-Bereich der Chrome-Entwicklerwerkzeuge
+       mit „Paint flashing“ (siehe Beschreibung). */
+
+
+    /* --- links: top, left, width, height, margin ---
+       Jede dieser Eigenschaften verändert das Layout.
+       Der Browser muss bei jedem Bild Lage und Größe neu berechnen (Reflow)
+       und die Fläche neu zeichnen (Repaint). Das kostet Rechenzeit und kann ruckeln. */
+
+    @keyframes huepfen-layout {
+      0%, 100% {
+        top: 128px; height: 64px; width: 64px; margin-left: 0;
+        animation-timing-function: ease-in;
+      }
+      45% {
+        top: 272px; height: 64px; width: 64px; margin-left: 0;   /* 272 + 64 = 336 */
+        animation-timing-function: linear;
+      }
+      50% {
+        /* Squash: breiter, flacher; Unterkante bleibt bei 336px, Mitte bleibt gleich */
+        top: 298px; height: 38px; width: 90px; margin-left: -13px;
+        animation-timing-function: linear;
+      }
+      55% {
+        /* Stretch: schmaler, höher */
+        top: 246px; height: 90px; width: 45px; margin-left: 9px;
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes schatten-layout {
+      0%, 100% {
+        top: 333px; height: 6px; width: 32px; margin-left: 16px; opacity: 0.1;
+        animation-timing-function: ease-in;
+      }
+      45% {
+        top: 330px; height: 12px; width: 64px; margin-left: 0; opacity: 0.35;
+        animation-timing-function: linear;
+      }
+      50% {
+        top: 330px; height: 12px; width: 90px; margin-left: -13px; opacity: 0.4;
+        animation-timing-function: linear;
+      }
+      55% {
+        top: 330px; height: 12px; width: 64px; margin-left: 0; opacity: 0.35;
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes rollen-layout {
+      from { left: -100px; }
+      to   { left: 100px; }
+    }
+
+    .bahn-layout .ball     { animation: huepfen-layout 1.2s infinite; }
+    .bahn-layout .schatten { animation: schatten-layout 1.2s infinite; }
+    .bahn-layout           { animation: rollen-layout 6s ease-in-out infinite alternate; }
+
+
+    /* --- rechts: transform und opacity ---
+       Ball, Schatten und Bahn werden als fertige Ebenen verschoben und verformt
+       (Compositing), oft von der Grafikkarte. Layout und Zeichnung bleiben unberührt. */
+
+    @keyframes huepfen {
+      0%, 100% {
+        transform: translateY(0) scale(1, 1);
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: translateY(144px) scale(1, 1);
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: translateY(144px) scale(1.4, 0.6);
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: translateY(144px) scale(0.7, 1.4);
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes schatten {
+      0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.1;
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: scale(1.4, 1);
+        opacity: 0.4;
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes rollen {
+      from { transform: translateX(-100px); }
+      to   { transform: translateX(100px); }
+    }
+
+    .bahn-transform .ball {
+      animation: huepfen 1.2s infinite;
+      transform-origin: 50% 100%;
+
+      /* Optional: kündigt dem Browser an, dass sich transform ändern wird.
+         Sparsam einsetzen – jede so markierte Ebene belegt Speicher. */
+      will-change: transform;
+    }
+
+    .bahn-transform .schatten { animation: schatten 1.2s infinite; }
+    .bahn-transform           { animation: rollen 6s ease-in-out infinite alternate; }
+
+
+    /* --- Barrierefreiheit ---
+       Manche Menschen reagieren auf Bewegung mit Schwindel oder Übelkeit.
+       Sie können im Betriebssystem „Bewegung reduzieren“ einstellen.
+       Diese Media Query fragt das ab.
+
+       Reduzieren heißt nicht unbedingt abschalten.
+       Beschwerden lösen vor allem große Ortsveränderungen aus
+       (Bewegung quer über den Bildschirm, Parallax, Zoom).
+       Deshalb hält hier nur die Bahn an; das Hüpfen an Ort und Stelle läuft weiter.
+       Auf beiden Seiten gleich – mit links und rechts hat das nichts zu tun. */
+    @media (prefers-reduced-motion: reduce) {
+      /* .buehne .bahn ist spezifischer als .bahn-layout und .bahn-transform
+         und gewinnt deshalb sicher gegen die Regeln oben. */
+      .buehne .bahn {
+        animation: none;
+      }
+
+      /* Alles abschalten ginge so – die Selektoren müssen dann ebenso
+         spezifisch sein wie .bahn-layout .ball, sonst verlieren sie:
+         .buehne .bahn, .buehne .ball, .buehne .schatten { animation: none; } */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="07-steuerung.html" rel="prev" aria-label="Vorherige Szene: 07 · Steuern und Endzustand"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 07</a>
+      <a href="09-grenze-gsap.html" rel="next" aria-label="Nächste Szene: 09 · Grenze: CSS und GSAP">09 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne geteilt">
+      <!-- links: Lage- und Größeneigenschaften -->
+      <div class="bahn bahn-layout">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+
+      <!-- rechts: transform und opacity -->
+      <div class="bahn bahn-transform">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>08 · Performance und Barrierefreiheit</h1>
+      <h2>Was passiert</h2>
+      <p>Zweimal die Szene aus 06 nebeneinander: Ball mit Squash and Stretch, Schatten, Bahn. Links wird alles über Lage- und Größeneigenschaften bewegt (<code>top</code>, <code>left</code>, <code>width</code>, <code>height</code>), rechts nur über <code>transform</code> und <code>opacity</code>. Ist „Bewegung reduzieren“ eingestellt, hält auf beiden Seiten die seitliche Bewegung an; das Hüpfen läuft weiter.</p>
+      <h2>Neu gegenüber 07</h2>
+      <p>Kein neuer Effekt, sondern Qualität. <code>transform</code> und <code>opacity</code> kann der Browser als fertige Ebene verschieben und verformen. Lage- und Größeneigenschaften zwingen ihn bei jedem Bild, das Layout neu zu berechnen und neu zu zeichnen. Die Media Query <code>prefers-reduced-motion</code> berücksichtigt Menschen, denen Bewegung Beschwerden macht. Reduzieren heißt nicht unbedingt abschalten: Hier stoppt die große Ortsveränderung, die kleine Bewegung an Ort und Stelle bleibt.</p>
+      <h2>Ausprobieren</h2>
+      <p>Rendering-Bereich öffnen: In den Entwicklerwerkzeugen öffnet <code>⌘ ⇧ P</code> (Windows: <code>Strg ⇧ P</code>) die Befehlszeile „Run Command“. Dort hinter dem <code>&gt;</code> „rendering“ eintippen und „Show Rendering“ wählen. Alternativ: Menü ⋮ oben rechts in den Entwicklerwerkzeugen → More tools → Rendering. Der Bereich erscheint unten im Entwicklerwerkzeug. „Paint flashing“ färbt grün, was neu gezeichnet wird: links ständig, rechts kaum. Unter „Emulate CSS media feature prefers-reduced-motion“ lässt sich „reduce“ einstellen.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-kommentar">/* links: Lage und Größe */</span>
+<span class="c-at">@keyframes</span> huepfen-layout {
+  <span class="c-selektor">50%</span> {
+    <span class="c-eigenschaft">top</span>: <span class="c-wert">298px</span>; <span class="c-eigenschaft">height</span>: <span class="c-wert">38px</span>;
+    <span class="c-eigenschaft">width</span>: <span class="c-wert">90px</span>; <span class="c-eigenschaft">margin-left</span>: <span class="c-wert">-13px</span>;
+  }
+  <span class="c-kommentar">/* weitere Stufen */</span>
+}
+
+<span class="c-kommentar">/* rechts: nur transform */</span>
+<span class="c-at">@keyframes</span> huepfen {
+  <span class="c-selektor">50%</span> {
+    <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(1.4, 0.6)</span>;
+  }
+  <span class="c-kommentar">/* weitere Stufen */</span>
+}
+
+<span class="c-kommentar">/* beide Seiten: seitliche Bewegung anhalten,
+   Hüpfen läuft weiter */</span>
+<span class="c-at">@media</span> (prefers-reduced-motion: reduce) {
+  <span class="c-selektor">.buehne .bahn</span> {
+    <span class="c-eigenschaft">animation</span>: <span class="c-wert">none</span>;
+  }
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

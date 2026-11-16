@@ -1,0 +1,425 @@
+/*
+  Grundlayout aller Szenen.
+  Hier steht alles, was in jeder Szene gleich bleibt:
+  Seitenlayout, Navigation, Beschreibung, Codefenster, Bühne, Horizont, Steuerung.
+  Was sich bewegt und die Bewegung selbst stehen im <style> der jeweiligen Szene.
+*/
+
+
+/*---------------------
+TYPOGRAPHY
+--------------------*/
+
+/* Inter von Rasmus Andersson, direkt von seiner Seite */
+@import url("https://rsms.me/inter/inter.css");
+
+:root {
+  font-family: Inter, sans-serif;
+  font-feature-settings: "liga" 1, "calt" 1;
+}
+
+/* variable Fassung, wo der Browser sie kann */
+@supports (font-variation-settings: normal) {
+  :root {
+    font-family: InterVariable, sans-serif;
+  }
+}
+
+body {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Navigation */
+.navigation a {
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Beschreibung */
+.beschreibung h1 {
+  font-size: 1.5em;
+  line-height: 1.25;
+}
+
+.beschreibung h2 {
+  font-size: 0.8125em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Code im Fließtext: em statt rem, damit er immer der umgebenden Schrift folgt.
+   0.9em, weil Monospace bei gleicher Größe optisch größer wirkt.
+   Zeilenhöhe erbt er vom Absatz. */
+.beschreibung code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+/* Codefenster */
+.code-teil h3 {
+  font-size: 0.75em;
+  letter-spacing: 0.08em;
+}
+
+.code pre {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.875em;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.c-kommentar {
+  font-style: italic;
+}
+
+/* Steuerung */
+.steuerung button {
+  font-family: inherit;  /* Buttons erben die Schrift sonst nicht */
+  font-size: 0.875em;
+  line-height: 1.4;
+}
+
+
+/*---------------------
+COLORS
+--------------------*/
+
+body {
+  background: #ecebe6;
+  color: #1e1e1e;
+}
+
+/* Navigation: Hintergrund, damit darunter durchscrollender Inhalt nicht durchscheint */
+.navigation {
+  background: #ecebe6;
+}
+
+.navigation a {
+  color: inherit;
+}
+
+.navigation a:hover {
+  background: #ffffff;
+}
+
+.navigation a:focus-visible {
+  outline-color: #3d7eff;
+}
+
+/* Beschreibung */
+.beschreibung h2 {
+  color: #757575;
+}
+
+.beschreibung code {
+  background: #ffffff;
+}
+
+/* Codefenster */
+.code {
+  background: #1e1f24;
+  color: #e6e6e6;
+}
+
+.code-kopf {
+  background: #2a2c33;
+}
+
+.code-kopf span {
+  background: #4a4d57;
+}
+
+.code-teil h3 {
+  color: #8a8f98;
+}
+
+.code-teil + .code-teil {
+  border-top-color: #2f3139;
+}
+
+/* Syntaxhervorhebung */
+.c-kommentar   { color: #8a8f98; }
+.c-at          { color: #ff8fb1; }
+.c-selektor    { color: #f9c859; }
+.c-eigenschaft { color: #7fb7ff; }
+.c-wert        { color: #a6e3a1; }
+.c-zahl        { color: #f9c859; }
+
+/* Bühne, Horizont, Trennlinie */
+.buehne {
+  background: #ffffff;
+}
+
+.buehne::after {
+  background: #1e1e1e;
+}
+
+.buehne.geteilt::before {
+  background: #e3e1db;
+}
+
+/* Steuerung */
+.steuerung button {
+  border-color: #1e1e1e;
+  background: #ffffff;
+  color: #1e1e1e;
+}
+
+.steuerung button:hover {
+  background: #ecebe6;
+}
+
+/* gesperrt, wenn die Aktion im aktuellen Zustand nicht passt */
+.steuerung button:disabled {
+  opacity: 0.35;
+  background: #ffffff;
+}
+
+.steuerung button:focus-visible {
+  outline-color: #3d7eff;
+}
+
+
+/*---------------------
+LAYOUT
+--------------------*/
+
+/* Seite */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bühne, Beschreibung und Codefenster: untereinander,
+   auf breiten Bildschirmen nebeneinander */
+.inhalt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 0 24px 48px;
+}
+
+.inhalt > .buehne {
+  flex-shrink: 0;
+}
+
+@media (min-width: 1160px) {
+  .inhalt {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 48px;
+  }
+}
+
+/* Navigation: sticky, bleibt beim Scrollen oben stehen (wichtig für Szene 10) */
+.navigation {
+  position: sticky;
+  top: 0;
+  z-index: 10;           /* über Bühne, Bahn und Steuerung */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.navigation a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.navigation a:focus-visible {
+  outline-style: solid;
+  outline-width: 3px;
+  outline-offset: 2px;
+}
+
+.navigation svg {
+  width: 20px;
+  height: 20px;
+}
+
+.blaettern {
+  display: flex;
+  gap: 8px;
+}
+
+/* Beschreibung */
+.beschreibung {
+  width: 720px;
+  max-width: 100%;
+}
+
+@media (min-width: 1160px) {
+  .beschreibung {
+    width: 340px;
+  }
+}
+
+.beschreibung h1 {
+  margin: 0 0 16px;
+}
+
+.beschreibung h2 {
+  margin: 20px 0 4px;
+}
+
+.beschreibung p {
+  margin: 0;
+}
+
+.beschreibung code {
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* Codefenster: zeigt die entscheidenden Stellen einer Szene zum Mitlesen.
+   Nur Anzeige – der wirksame Code steht im <style> bzw. <script> der Szene. */
+.code {
+  width: 520px;
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+  border-radius: 8px;
+}
+
+/* Kopfleiste mit drei Punkten, wie ein Editorfenster */
+.code-kopf {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+}
+
+.code-kopf span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-teil h3 {
+  margin: 0;
+  padding: 14px 16px 0;
+}
+
+.code-teil + .code-teil {
+  border-top-style: solid;
+  border-top-width: 1px;
+}
+
+.code pre {
+  margin: 0;
+  padding: 8px 16px 16px;
+  overflow-x: auto;
+}
+
+/* Bühne: Bezugsrahmen für alles, was absolut positioniert ist */
+.buehne {
+  position: relative;
+  width: 720px;
+  height: 480px;
+}
+
+/* Horizont: feine Linie, 300px von oben.
+   Darunter liegt der Boden; der Ball setzt bei 336px auf. */
+.buehne::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300px;
+  height: 1px;
+}
+
+/* UI-Bühne (Serie 2, Szenen 11–20): ohne Horizont, Inhalt mittig.
+   overflow: hidden, damit hereinfahrende Elemente außerhalb unsichtbar bleiben. */
+.buehne.ui {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.buehne.ui::after {
+  content: none;
+}
+
+/* Geteilte Bühne (Szenen 08 und 09): zwei Hälften, getrennt durch eine feine Linie */
+.buehne.geteilt::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 360px;
+  width: 1px;
+}
+
+/* Steuerung: Buttons am unteren Rand der Bühne (Szenen 07 und 09) */
+.steuerung {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  z-index: 2;            /* vor allem, was sich bewegt */
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.steuerung button {
+  padding: 6px 14px;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.steuerung button:disabled {
+  cursor: default;
+}
+
+.steuerung button:focus-visible {
+  outline-style: solid;
+  outline-width: 3px;
+  outline-offset: 2px;
+}
+
+/* Scrollbare Seite (Szene 10):
+   Ohne Scrollweg gibt es keinen Scrollfortschritt, an den die Animation gekoppelt werden kann.
+   Die Bühne bleibt beim Scrollen mittig im Fenster stehen (sticky). */
+.scroll-szene .inhalt {
+  min-height: 300vh;
+  justify-content: flex-start;
+}
+
+/* schmale Bildschirme: Beschreibung und Code oben, sie scrollen weg */
+.scroll-szene .beschreibung,
+.scroll-szene .code {
+  order: -1;
+}
+
+.scroll-szene .inhalt > .buehne {
+  position: sticky;
+  top: calc(50vh - 240px);   /* halbe Fensterhöhe minus halbe Bühnenhöhe */
+}
+
+/* breite Bildschirme: alles nebeneinander, alles bleibt stehen */
+@media (min-width: 1160px) {
+  .scroll-szene .inhalt {
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .scroll-szene .beschreibung,
+  .scroll-szene .code {
+    order: 0;
+    position: sticky;
+    top: calc(50vh - 240px);
+  }
+}

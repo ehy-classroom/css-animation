@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10 · Ausblick: Scroll</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+    .schatten {
+      background: #1e1e1e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    /* Bahn: unsichtbare Ebene über der ganzen Bühne.
+       Sie trägt Ball und Schatten und bewegt beide gemeinsam zur Seite. */
+    .bahn {
+      position: absolute;
+      inset: 0;
+      z-index: 1;            /* vor dem Horizont */
+    }
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Schatten */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+    /* Schatten: flache Ellipse auf dem Boden, genau unter dem Aufsetzpunkt (336px) */
+    .schatten {
+      position: absolute;
+      top: 330px;
+      left: 328px;
+      width: 64px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 10 · Ausblick: scrollgesteuerte Animation
+       Die Szene aus 06, aber nicht nach Zeit, sondern im Takt des Scrollens:
+       Über den ganzen Scrollweg wandert der Ball von links nach rechts
+       und springt dabei dreimal. Zurückscrollen spult rückwärts. */
+
+    @keyframes huepfen {
+      0%, 100% {
+        transform: translateY(0) scale(1, 1);
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: translateY(144px) scale(1, 1);
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: translateY(144px) scale(1.4, 0.6);
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: translateY(144px) scale(0.7, 1.4);
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes schatten {
+      0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.1;
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: scale(1.4, 1);
+        opacity: 0.4;
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes rollen {
+      from { transform: translateX(-240px); }
+      to   { transform: translateX(240px); }
+    }
+
+    .ball {
+      transform-origin: 50% 100%;
+    }
+
+    /* @supports: nur anwenden, wenn der Browser animation-timeline kennt.
+       Sonst bleibt die Szene still stehen.
+       Unterstützung vor dem Einsatz prüfen, z. B. auf caniuse.com. */
+    @supports (animation-timeline: scroll()) {
+
+      /* auto als Dauer: Der Fortschritt kommt vom Scrollen, nicht von der Uhr.
+         3 Durchläufe: Der Scrollweg wird auf drei Sprünge verteilt.
+         both: oben auf der Seite gilt der erste, unten der letzte Keyframe. */
+      .ball {
+        animation: huepfen auto 3 both;
+
+        /* animation-timeline ersetzt die Zeit durch eine andere Zeitleiste.
+           scroll() = Scrollfortschritt des nächsten scrollbaren Vorfahren,
+           hier also der ganzen Seite: 0 % oben, 100 % unten.
+           Wichtig: nach der Kurzschreibweise notieren,
+           weil animation die Zeitleiste sonst zurücksetzt. */
+        animation-timeline: scroll();
+      }
+
+      .schatten {
+        animation: schatten auto 3 both;
+        animation-timeline: scroll();
+      }
+
+      /* Bahn: einmal über den ganzen Scrollweg, gleichmäßig */
+      .bahn {
+        animation: rollen auto linear both;
+        animation-timeline: scroll();
+      }
+    }
+
+    /* Verwandt:
+       view()            – Fortschritt, während ein Element durchs Bild läuft
+       View Transitions  – animierte Übergänge zwischen Ansichten oder Seiten
+       In GSAP heißt das Gegenstück ScrollTrigger. */
+  </style>
+</head>
+<body class="scroll-szene">
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="09-grenze-gsap.html" rel="prev" aria-label="Vorherige Szene: 09 · Grenze: CSS und GSAP"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 09</a>
+      <a href="11-button.html" rel="next" aria-label="Nächste Szene: 11 · Button">11 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="bahn">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>10 · Ausblick: Scroll</h1>
+      <h2>Was passiert</h2>
+      <p>Die Szene aus 06 im Takt des Scrollens: Beim Scrollen nach unten wandert der Ball von links nach rechts und springt dabei dreimal auf, mit Squash and Stretch und Schatten. Zurückscrollen spult die Bewegung rückwärts.</p>
+      <h2>Neu gegenüber 09</h2>
+      <p>Der Fortschritt kommt nicht aus der Zeit, sondern aus dem Scrollen (<code>animation-timeline: scroll()</code>). Dauer, Wiederholungen und Keyframes funktionieren weiter; drei Durchläufe verteilen sich auf den Scrollweg. Das ist eine neuere CSS-Funktion: Kennt ein Browser sie nicht, bleibt die Szene stehen. In GSAP heißt das Gegenstück ScrollTrigger.</p>
+      <h2>Bedienung</h2>
+      <p>Seite scrollen.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@supports</span> (animation-timeline: scroll()) {
+  <span class="c-selektor">.ball</span> {
+    <span class="c-eigenschaft">animation</span>: <span class="c-wert">huepfen auto 3 both</span>;
+    <span class="c-eigenschaft">animation-timeline</span>: <span class="c-wert">scroll()</span>;
+  }
+  <span class="c-selektor">.schatten</span> {
+    <span class="c-eigenschaft">animation</span>: <span class="c-wert">schatten auto 3 both</span>;
+    <span class="c-eigenschaft">animation-timeline</span>: <span class="c-wert">scroll()</span>;
+  }
+  <span class="c-selektor">.bahn</span> {
+    <span class="c-eigenschaft">animation</span>: <span class="c-wert">rollen auto linear both</span>;
+    <span class="c-eigenschaft">animation-timeline</span>: <span class="c-wert">scroll()</span>;
+  }
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

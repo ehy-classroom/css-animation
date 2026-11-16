@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>04 · Easing</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Horizont */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 04 · Easing
+       Die Timing-Funktion verteilt das Tempo über die Dauer.
+       Weg und Dauer bleiben gleich wie in 03 – nur der Tempoverlauf ändert sich. */
+
+    @keyframes fallen {
+      from { transform: translateY(0); }
+      to   { transform: translateY(144px); }
+    }
+
+    .ball {
+      animation-name: fallen;
+      animation-duration: 0.6s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+
+      /* ease-in: langsam beginnen, dann schneller werden – wie ein fallender Körper.
+         Bei alternate läuft auch die Kurve rückwärts:
+         Beim Steigen wird daraus ease-out, der Ball bremst nach oben hin ab. */
+      animation-timing-function: ease-in;
+
+      /* Die Schlüsselwörter sind Kurzformen für Bézierkurven:
+         linear      = cubic-bezier(0, 0, 1, 1)         gleichmäßig
+         ease        = cubic-bezier(0.25, 0.1, 0.25, 1) Standard: zügig an, sanft aus
+         ease-in     = cubic-bezier(0.42, 0, 1, 1)      langsam an
+         ease-out    = cubic-bezier(0, 0, 0.58, 1)      langsam aus
+         ease-in-out = cubic-bezier(0.42, 0, 0.58, 1)   langsam an und aus
+
+         Eigene Kurve, z. B. stärker beschleunigt als ease-in:
+         animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+
+         Stufen statt fließender Bewegung, z. B. für Daumenkino-Effekte:
+         animation-timing-function: steps(6); */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="03-wiederholung.html" rel="prev" aria-label="Vorherige Szene: 03 · Wiederholen und Richtung"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 03</a>
+      <a href="05-squash-stretch.html" rel="next" aria-label="Nächste Szene: 05 · Squash and Stretch">05 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="ball"></div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>04 · Easing</h1>
+      <h2>Was passiert</h2>
+      <p>Der Ball beschleunigt im Fall und wird beim Steigen langsamer. Die Bewegung folgt sichtbar der Schwerkraft.</p>
+      <h2>Neu gegenüber 03</h2>
+      <p>Nur die Timing-Funktion ändert sich: <code>ease-in</code> statt <code>linear</code>. Weg und Dauer bleiben gleich. Weil die Richtung wechselt, läuft auch die Kurve rückwärts: Aus ease-in wird beim Steigen ease-out.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> fallen {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(0)</span>; }
+  <span class="c-selektor">to</span>   { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px)</span>; }
+}
+
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation-name</span>: <span class="c-wert">fallen</span>;
+  <span class="c-eigenschaft">animation-duration</span>: <span class="c-wert">0.6s</span>;
+  <span class="c-eigenschaft">animation-iteration-count</span>: <span class="c-wert">infinite</span>;
+  <span class="c-eigenschaft">animation-direction</span>: <span class="c-wert">alternate</span>;
+  <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">ease-in</span>;
+}
+
+<span class="c-kommentar">/* ease-in = cubic-bezier(0.42, 0, 1, 1) */</span></code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

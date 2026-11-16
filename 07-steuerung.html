@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>07 · Steuern und Endzustand</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+    .schatten {
+      background: #1e1e1e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    /* Bahn: unsichtbare Ebene über der ganzen Bühne.
+       Sie trägt Ball und Schatten und bewegt beide gemeinsam zur Seite. */
+    .bahn {
+      position: absolute;
+      inset: 0;
+      z-index: 1;            /* vor dem Horizont */
+    }
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Schatten */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+    /* Schatten: flache Ellipse auf dem Boden, genau unter dem Aufsetzpunkt (336px) */
+    .schatten {
+      position: absolute;
+      top: 330px;
+      left: 328px;
+      width: 64px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 07 · Steuern und Endzustand
+       Die Szene aus 06: Ball mit Squash and Stretch, Schatten, Bahn.
+       Drei Buttons steuern sie:
+         Anhalten / Weiter – alle Animationen einfrieren und fortsetzen
+         Landen            – nach dem nächsten Scheitelpunkt landen und liegen bleiben
+         Abspringen        – vom Boden aus weiterhüpfen
+       Das Skript setzt nur Klassen an der Bühne.
+       Was dann passiert, steht hier im CSS. */
+
+    /* Ball, Schatten und Bahn wie in 06 */
+    @keyframes huepfen {
+      0%, 100% {
+        transform: translateY(0) scale(1, 1);
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: translateY(144px) scale(1, 1);
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: translateY(144px) scale(1.4, 0.6);
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: translateY(144px) scale(0.7, 1.4);
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes schatten {
+      0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.1;
+        animation-timing-function: ease-in;
+      }
+      45% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: linear;
+      }
+      50% {
+        transform: scale(1.4, 1);
+        opacity: 0.4;
+        animation-timing-function: linear;
+      }
+      55% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: ease-out;
+      }
+    }
+
+    @keyframes rollen {
+      from { transform: translateX(-240px); }
+      to   { transform: translateX(240px); }
+    }
+
+    /* Landung: Der Fall dauert wie beim Hüpfen 0,54s (60 % von 0,9s),
+       dann ein schwächerer Aufprall, dann liegt der Ball rund. */
+    @keyframes landen {
+      0% {
+        transform: translateY(0) scale(1, 1);
+        animation-timing-function: ease-in;
+      }
+      60% {
+        transform: translateY(144px) scale(1, 1);
+        animation-timing-function: ease-out;
+      }
+      75% {
+        transform: translateY(144px) scale(1.3, 0.7);
+        animation-timing-function: ease-out;
+      }
+      100% {
+        transform: translateY(144px) scale(1, 1);
+      }
+    }
+
+    /* Schatten zur Landung: gleiche Stufen wie beim Ball */
+    @keyframes schatten-landen {
+      0% {
+        transform: scale(0.5);
+        opacity: 0.1;
+        animation-timing-function: ease-in;
+      }
+      60% {
+        transform: scale(1);
+        opacity: 0.35;
+        animation-timing-function: ease-out;
+      }
+      75% {
+        transform: scale(1.3, 1);
+        opacity: 0.4;
+        animation-timing-function: ease-out;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.35;
+      }
+    }
+
+    .ball {
+      animation: huepfen 1.2s infinite;
+      /* Negative Verzögerung: Die Animation beginnt nicht bei 0 %,
+         sondern 0,54s „weiter“, also bei 45 % – der Ball steht rund auf dem Boden.
+         So setzt das Abspringen nach einer Landung nahtlos an. */
+      animation-delay: -0.54s;
+      transform-origin: 50% 100%;
+    }
+
+    .schatten {
+      animation: schatten 1.2s infinite;
+      animation-delay: -0.54s;   /* synchron zum Ball */
+    }
+
+    .bahn {
+      animation: rollen 6s ease-in-out infinite alternate;
+    }
+
+    /* Anhalten: animation-play-state friert eine Animation an der aktuellen Stelle ein.
+       running = läuft (Standard), paused = angehalten.
+       „Weiter“ setzt sie an genau dieser Stelle fort. */
+    .buehne.angehalten .ball,
+    .buehne.angehalten .schatten,
+    .buehne.angehalten .bahn {
+      animation-play-state: paused;
+    }
+
+    /* Landen: eine andere Animation, die nur einmal läuft.
+       Die Kurzschreibweise setzt auch die negative Verzögerung zurück. */
+    .buehne.gelandet .ball {
+      animation: landen 0.9s;
+
+      /* animation-fill-mode legt fest, was vor und nach der Animation gilt:
+         none      = nach dem Ende zurück in die Ausgangslage (Standard, siehe 02)
+         forwards  = der letzte Keyframe bleibt stehen → Ball bleibt liegen
+         backwards = der erste Keyframe gilt schon während einer Verzögerung
+         both      = beides */
+      animation-fill-mode: forwards;
+    }
+
+    .buehne.gelandet .schatten {
+      animation: schatten-landen 0.9s forwards;
+    }
+
+    /* Die Bahn hält dort an, wo der Ball landet */
+    .buehne.gelandet .bahn {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="06-kombination.html" rel="prev" aria-label="Vorherige Szene: 06 · Animationen kombinieren"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 06</a>
+      <a href="08-performance-a11y.html" rel="next" aria-label="Nächste Szene: 08 · Performance und Barrierefreiheit">08 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="bahn">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+
+      <!-- Steuerung: eigene Buttons statt Hover oder Klick auf den Ball -->
+      <div class="steuerung">
+        <button type="button" class="knopf-pause" aria-pressed="false">Anhalten</button>
+        <button type="button" class="knopf-landen">Landen</button>
+        <button type="button" class="knopf-abspringen">Abspringen</button>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>07 · Steuern und Endzustand</h1>
+      <h2>Was passiert</h2>
+      <p>Die Szene aus 06 – Ball mit Squash and Stretch, Schatten und Seitwärtsbewegung – lässt sich über drei Buttons steuern. „Anhalten“ friert alles ein, „Weiter“ setzt fort. „Landen“ lässt den Ball nach dem nächsten Scheitelpunkt aufsetzen und liegen bleiben; die Bahn hält an. „Abspringen“ lässt ihn vom Boden aus weiterhüpfen.</p>
+      <h2>Neu gegenüber 06</h2>
+      <p><code>animation-play-state</code> hält laufende Animationen an und setzt sie an derselben Stelle fort. <code>animation-fill-mode: forwards</code> hält nach dem Ende der Landung den letzten Zustand fest – die Antwort auf den Rücksprung aus 02. Eine negative <code>animation-delay</code> lässt das Hüpfen mitten im Ablauf beginnen, am Boden. Das Skript setzt nur Klassen; mit dem Ereignis <code>animationiteration</code> wartet es auf den Scheitelpunkt, damit die Landung nahtlos ansetzt.</p>
+      <h2>Bedienung</h2>
+      <p>Buttons am unteren Rand der Bühne, per Maus oder Tastatur.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">huepfen 1.2s infinite</span>;
+  <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">-0.54s</span>; <span class="c-kommentar">/* Start bei 45 % */</span>
+}
+
+<span class="c-selektor">.buehne.angehalten .ball,
+.buehne.angehalten .schatten,
+.buehne.angehalten .bahn</span> {
+  <span class="c-eigenschaft">animation-play-state</span>: <span class="c-wert">paused</span>;
+}
+
+<span class="c-selektor">.buehne.gelandet .ball</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">landen 0.9s</span>;
+  <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">forwards</span>;
+}
+
+<span class="c-selektor">.buehne.gelandet .bahn</span> {
+  <span class="c-eigenschaft">animation-play-state</span>: <span class="c-wert">paused</span>;
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JS</h3>
+<pre><code>knopfLanden.addEventListener(<span class="c-wert">'click'</span>, () =&gt; {
+  <span class="c-kommentar">// warten, bis der Ball oben ist</span>
+  ball.addEventListener(<span class="c-wert">'animationiteration'</span>, () =&gt; {
+    buehne.classList.add(<span class="c-wert">'gelandet'</span>);
+  }, { <span class="c-eigenschaft">once</span>: true });
+});
+
+knopfAbspringen.addEventListener(<span class="c-wert">'click'</span>, () =&gt; {
+  buehne.classList.remove(<span class="c-wert">'gelandet'</span>);
+});</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Das Skript bewegt nichts selbst.
+    // Es setzt Klassen an der Bühne (.angehalten, .gelandet);
+    // welche Animation dann läuft, entscheidet das CSS.
+    const buehne = document.querySelector('.buehne');
+    const ball = document.querySelector('.ball');
+    const knopfPause = document.querySelector('.knopf-pause');
+    const knopfLanden = document.querySelector('.knopf-landen');
+    const knopfAbspringen = document.querySelector('.knopf-abspringen');
+
+    // true, solange „Landen“ gedrückt ist, der Ball aber noch nicht oben war
+    let wartetAufLandung = false;
+
+    // Buttons passend zum Zustand beschriften, freigeben oder sperren
+    function aktualisieren() {
+      const angehalten = buehne.classList.contains('angehalten');
+      const gelandet = buehne.classList.contains('gelandet');
+
+      knopfPause.textContent = angehalten ? 'Weiter' : 'Anhalten';
+      knopfPause.setAttribute('aria-pressed', angehalten);
+      knopfPause.disabled = gelandet || wartetAufLandung;
+      knopfLanden.disabled = gelandet || wartetAufLandung;
+      knopfAbspringen.disabled = !gelandet;
+    }
+
+    knopfPause.addEventListener('click', () => {
+      buehne.classList.toggle('angehalten');
+      aktualisieren();
+    });
+
+    knopfLanden.addEventListener('click', () => {
+      // Nicht sofort umschalten, sonst springt der Ball an den Anfang der Landung.
+      // animationiteration feuert am Ende jedes Durchlaufs von „huepfen“ –
+      // dann ist der Ball am Scheitelpunkt, genau dort, wo „landen“ beginnt.
+      wartetAufLandung = true;
+      buehne.classList.remove('angehalten');
+      aktualisieren();
+
+      ball.addEventListener('animationiteration', () => {
+        wartetAufLandung = false;
+        buehne.classList.add('gelandet');
+        aktualisieren();
+      }, { once: true });   // once: nur beim nächsten Mal reagieren
+    });
+
+    knopfAbspringen.addEventListener('click', () => {
+      // Ohne .gelandet gilt wieder „huepfen“ mit der negativen Verzögerung:
+      // Der Ball startet am Boden und springt ab.
+      buehne.classList.remove('gelandet');
+      aktualisieren();
+    });
+
+    aktualisieren();
+  </script>
+
+</body>
+</html>

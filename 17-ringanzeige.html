@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>17 · Ringanzeige mit Zähler</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    .ring-zahl {
+      font-size: 2.6em;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .anzeige-text {
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ring circle {
+      fill: none;
+    }
+
+    .ring-spur {
+      stroke: #ecebe6;
+    }
+
+    .ring-wert {
+      stroke: #e4572e;
+    }
+
+    .anzeige-text {
+      color: #757575;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .anzeige {
+      display: grid;
+      justify-items: center;
+      gap: 1em;
+      margin: 0 0 48px;   /* Platz für die Steuerung darunter */
+    }
+
+    .ring-rahmen {
+      position: relative;
+      width: 16em;
+      height: 16em;
+    }
+
+    /* Ein SVG-Kreis beginnt bei 3 Uhr; um −90° gedreht beginnt er oben */
+    .ring {
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring circle {
+      stroke-width: 10;
+    }
+
+    /* Zahl genau in der Mitte des Rings */
+    .ring-zahl {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 17 · Ringanzeige mit Zähler */
+
+    /* Ring: Der Kreis wird als gestrichelte Linie gezeichnet.
+       pathLength="100" im SVG setzt den Umfang auf 100 Einheiten –
+       damit entsprechen die Werte direkt Prozent.
+       stroke-dasharray 100: ein Strich so lang wie der ganze Kreis.
+       stroke-dashoffset verschiebt ihn: 100 = ganz weg, 28 = 72 % sichtbar. */
+    .ring-wert {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: ring-fuellen 2s ease-out 0.5s forwards;
+    }
+
+    @keyframes ring-fuellen {
+      to { stroke-dashoffset: 28; }
+    }
+
+    /* Zahl: @property gibt der Custom Property einen Typ (ganze Zahl).
+       Erst dadurch kann der Browser zwischen 0 und 72 rechnen;
+       ohne Typ würde der Wert am Ende einfach umspringen. */
+    @property --wert {
+      syntax: "<integer>";
+      inherits: false;
+      initial-value: 0;
+    }
+
+    @keyframes zaehlen {
+      to { --wert: 72; }
+    }
+
+    .ring-zahl {
+      /* gleiche Dauer, Verzögerung und Easing wie der Ring: beide laufen synchron */
+      animation: zaehlen 2s ease-out 0.5s forwards;
+
+      /* Text kann eine Zahl nur über einen Zähler ausgeben:
+         Der Zähler „wert“ bekommt den aktuellen Wert von --wert */
+      counter-reset: wert var(--wert);
+    }
+
+    .ring-zahl::after {
+      content: counter(wert) " %";
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="16-fortschritt.html" rel="prev" aria-label="Vorherige Szene: 16 · Fortschrittsbalken"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 16</a>
+      <a href="18-uhr.html" rel="next" aria-label="Nächste Szene: 18 · Analoge Uhr">18 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <figure class="anzeige">
+        <div class="ring-rahmen" role="img" aria-label="72 Prozent">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-spur" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-wert" cx="60" cy="60" r="52" pathLength="100"></circle>
+          </svg>
+          <span class="ring-zahl" aria-hidden="true"></span>
+        </div>
+        <figcaption class="anzeige-text">Speicher belegt</figcaption>
+      </figure>
+
+      <div class="steuerung">
+        <button type="button" class="knopf-wiederholen">Wiederholen</button>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>17 · Ringanzeige mit Zähler</h1>
+      <h2>Was passiert</h2>
+      <p>Eine Ringanzeige füllt sich auf 72 Prozent, die Zahl in der Mitte zählt im gleichen Takt von 0 bis 72 hoch.</p>
+      <h2>Neu gegenüber 16</h2>
+      <p>Zwei neue Werkzeuge. Der Ring ist ein SVG-Kreis, dessen Strich über <code>stroke-dashoffset</code> wächst. Die Zahl ist eine Custom Property, die per <code>@property</code> einen Typ bekommt – erst dann lässt sie sich animieren. <code>counter()</code> gibt sie als Text aus. Gleiche Dauer und gleiches Easing halten beide synchron.</p>
+      <h2>Bedienung</h2>
+      <p>„Wiederholen“ lädt die Seite neu.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.ring-wert</span> {
+  <span class="c-eigenschaft">stroke-dasharray</span>: <span class="c-wert">100</span>;
+  <span class="c-eigenschaft">stroke-dashoffset</span>: <span class="c-wert">100</span>;
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">ring-fuellen 2s ease-out 0.5s forwards</span>;
+}
+<span class="c-at">@keyframes</span> ring-fuellen {
+  <span class="c-selektor">to</span> { <span class="c-eigenschaft">stroke-dashoffset</span>: <span class="c-wert">28</span>; }
+}
+
+<span class="c-at">@property</span> --wert {
+  <span class="c-eigenschaft">syntax</span>: <span class="c-wert">"&lt;integer&gt;"</span>;
+  <span class="c-eigenschaft">inherits</span>: <span class="c-wert">false</span>;
+  <span class="c-eigenschaft">initial-value</span>: <span class="c-wert">0</span>;
+}
+<span class="c-at">@keyframes</span> zaehlen {
+  <span class="c-selektor">to</span> { <span class="c-eigenschaft">--wert</span>: <span class="c-wert">72</span>; }
+}
+
+<span class="c-selektor">.ring-zahl</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">zaehlen 2s ease-out 0.5s forwards</span>;
+  <span class="c-eigenschaft">counter-reset</span>: <span class="c-wert">wert var(--wert)</span>;
+}
+<span class="c-selektor">.ring-zahl::after</span> {
+  <span class="c-eigenschaft">content</span>: <span class="c-wert">counter(wert) " %"</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Wiederholen: am einfachsten die Seite neu laden (ohne Neuladen: siehe 19)
+    document.querySelector('.knopf-wiederholen').addEventListener('click', () => {
+      location.reload();
+    });
+  </script>
+
+</body>
+</html>

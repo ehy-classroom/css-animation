@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>02 · @keyframes</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Horizont */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 02 · @keyframes
+       Bewegung ohne Auslöser: Der Ball fällt beim Laden der Seite von selbst.
+       Zum Wiederholen die Seite neu laden. */
+
+    /* @keyframes beschreibt den Ablauf und gibt ihm einen Namen.
+       from = Anfang (0 %), to = Ende (100 %).
+       Hier passiert noch nichts – die Keyframes sind nur eine Beschreibung. */
+    @keyframes fallen {
+      from { transform: translateY(0); }
+      to   { transform: translateY(144px); }   /* Unterkante bei 336px, vor dem Horizont */
+    }
+
+    .ball {
+      /* animation verbindet die Keyframes mit dem Element */
+      animation-name: fallen;               /* welche Keyframes */
+      animation-duration: 0.6s;             /* wie lange ein Durchlauf dauert */
+      animation-timing-function: linear;    /* gleichmäßiges Tempo; Standard wäre ease */
+      animation-delay: 1s;                  /* kurz warten, damit man den Start sieht */
+
+      /* Nach dem Ende springt der Ball zurück in die Ausgangslage:
+         Die Animation gilt nur, solange sie läuft. (Abhilfe: Szene 07) */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="01-transition.html" rel="prev" aria-label="Vorherige Szene: 01 · transition"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 01</a>
+      <a href="03-wiederholung.html" rel="next" aria-label="Nächste Szene: 03 · Wiederholen und Richtung">03 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="ball"></div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>02 · @keyframes</h1>
+      <h2>Was passiert</h2>
+      <p>Eine Sekunde nach dem Laden fällt der Ball von selbst einmal nach unten und springt danach zurück in die Ausgangslage.</p>
+      <h2>Neu gegenüber 01</h2>
+      <p>Kein Auslöser mehr. <code>@keyframes</code> beschreibt einen Ablauf unter eigenem Namen, <code>animation</code> spielt ihn am Element ab. Ohne weitere Angabe gilt die Animation nur, solange sie läuft – daher der Sprung zurück.</p>
+      <h2>Bedienung</h2>
+      <p>Seite neu laden, um die Animation zu wiederholen.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> fallen {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(0)</span>; }
+  <span class="c-selektor">to</span>   { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px)</span>; }
+}
+
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation-name</span>: <span class="c-wert">fallen</span>;
+  <span class="c-eigenschaft">animation-duration</span>: <span class="c-wert">0.6s</span>;
+  <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">linear</span>;
+  <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">1s</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

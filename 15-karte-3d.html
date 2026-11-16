@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>15 · Karte umdrehen (3D)</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    /* Buttons erben Schrift und Ausrichtung nicht von selbst */
+    .karte {
+      font-family: inherit;
+      font-size: 1.1em;
+      text-align: left;
+    }
+
+    .etikett {
+      font-size: 0.8em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .zahl {
+      font-size: 2.4em;
+      font-weight: 700;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hinweis {
+      font-size: 0.85em;
+    }
+
+    .zeile {
+      font-size: 1.1em;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .karte {
+      background: transparent;
+      color: inherit;
+    }
+
+    .karte:focus-visible {
+      outline-color: #3d7eff;
+    }
+
+    .vorne {
+      background: #1e1e1e;
+      color: #ffffff;
+    }
+
+    .vorne .etikett,
+    .vorne .hinweis {
+      color: #b3b3b3;
+    }
+
+    .hinten {
+      background: #ecebe6;
+      color: #1e1e1e;
+    }
+
+    .hinten .etikett {
+      color: #757575;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .karte {
+      width: 18em;
+      height: 11em;
+      padding: 0;
+      border-style: none;
+      border-radius: 0.75em;
+      cursor: pointer;
+    }
+
+    .karte:focus-visible {
+      outline-style: solid;
+      outline-width: 3px;
+      outline-offset: 6px;
+    }
+
+    .karte-innen {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Vorder- und Rückseite liegen genau übereinander */
+    .seite {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.4em;
+      padding: 1.5em;
+      border-radius: 0.75em;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 15 · Karte umdrehen (3D) */
+
+    /* perspective am Elternelement: Abstand des Betrachters zur Karte.
+       Kleiner Wert = starke Verzerrung, großer Wert = flach. */
+    .karte {
+      perspective: 60em;
+    }
+
+    /* preserve-3d: Die Seiten bleiben im 3D-Raum,
+       statt flach auf eine Ebene gedrückt zu werden */
+    .karte-innen {
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    /* Die abgewandte Seite unsichtbar machen:
+       Man sieht immer nur die Seite, die zum Betrachter zeigt */
+    .seite {
+      backface-visibility: hidden;
+    }
+
+    /* Die Rückseite ist von Anfang an um 180° gedreht –
+       sie liegt mit dem Rücken nach vorn */
+    .hinten {
+      transform: rotateY(180deg);
+    }
+
+    /* Umgedreht: die ganze Karte um die senkrechte Achse drehen */
+    .karte.umgedreht .karte-innen {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="14-ladeindikatoren.html" rel="prev" aria-label="Vorherige Szene: 14 · Ladeindikatoren"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 14</a>
+      <a href="16-fortschritt.html" rel="next" aria-label="Nächste Szene: 16 · Fortschrittsbalken">16 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <button class="karte" type="button" aria-pressed="false">
+        <span class="karte-innen">
+          <span class="seite vorne">
+            <span class="etikett">Umsatz Oktober</span>
+            <span class="zahl">48.250 €</span>
+            <span class="hinweis">Details auf der Rückseite</span>
+          </span>
+          <span class="seite hinten">
+            <span class="etikett">Details</span>
+            <span class="zeile">+12 % zum Vormonat</span>
+            <span class="zeile">Ziel: 50.000 €</span>
+            <span class="zeile">96,5 % erreicht</span>
+          </span>
+        </span>
+      </button>
+    </div>
+
+    <section class="beschreibung">
+      <h1>15 · Karte umdrehen (3D)</h1>
+      <h2>Was passiert</h2>
+      <p>Eine Kennzahl-Kachel dreht sich beim Klicken um die senkrechte Achse und zeigt auf der Rückseite Details. Ein weiterer Klick dreht sie zurück.</p>
+      <h2>Neu gegenüber 14</h2>
+      <p>Die dritte Dimension. <code>perspective</code> legt den Abstand des Betrachters fest, <code>transform-style: preserve-3d</code> hält Vorder- und Rückseite im Raum, <code>backface-visibility: hidden</code> blendet die abgewandte Seite aus. Die Bewegung selbst ist eine einfache <code>transition</code> auf <code>rotateY()</code>.</p>
+      <h2>Bedienung</h2>
+      <p>Klick auf die Karte, oder mit Tab ansteuern und Enter drücken.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.karte</span> {
+  <span class="c-eigenschaft">perspective</span>: <span class="c-wert">60em</span>;
+}
+
+<span class="c-selektor">.karte-innen</span> {
+  <span class="c-eigenschaft">transform-style</span>: <span class="c-wert">preserve-3d</span>;
+  <span class="c-eigenschaft">transition</span>: <span class="c-wert">transform 0.6s ease-in-out</span>;
+}
+
+<span class="c-selektor">.seite</span> {
+  <span class="c-eigenschaft">backface-visibility</span>: <span class="c-wert">hidden</span>;
+}
+
+<span class="c-selektor">.hinten</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">rotateY(180deg)</span>;
+}
+
+<span class="c-selektor">.karte.umgedreht .karte-innen</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">rotateY(180deg)</span>;
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JS</h3>
+<pre><code>karte.addEventListener(<span class="c-wert">'click'</span>, () =&gt; {
+  <span class="c-at">const</span> umgedreht = karte.classList.toggle(<span class="c-wert">'umgedreht'</span>);
+  karte.setAttribute(<span class="c-wert">'aria-pressed'</span>, umgedreht);
+});</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Das Skript setzt nur die Klasse .umgedreht; die Drehung steht im CSS
+    const karte = document.querySelector('.karte');
+
+    karte.addEventListener('click', () => {
+      const umgedreht = karte.classList.toggle('umgedreht');
+      karte.setAttribute('aria-pressed', umgedreht);
+    });
+  </script>
+
+</body>
+</html>

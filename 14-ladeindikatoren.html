@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>14 · Ladeindikatoren</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    /* Grundgröße der Anzeigen: alle Maße unten in em */
+    .lader {
+      font-size: 1.25em;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    /* Ring: hellgrau, ein Viertel des Randes in Rot */
+    .spinner {
+      border-color: #ecebe6;
+      border-top-color: #e4572e;
+    }
+
+    .punkte span {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .lader {
+      display: flex;
+      align-items: center;
+      gap: 6em;
+    }
+
+    .spinner {
+      width: 4em;
+      height: 4em;
+      border-style: solid;
+      border-width: 0.4em;
+      border-radius: 50%;
+    }
+
+    .punkte {
+      display: flex;
+      gap: 0.6em;
+    }
+
+    .punkte span {
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 14 · Ladeindikatoren */
+
+    /* Spinner: dreht sich endlos.
+       Nur to: Der Anfang ist der aktuelle Zustand (0°).
+       linear: gleichmäßig – mit Easing würde er bei jeder Umdrehung stocken. */
+    @keyframes drehen {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      animation: drehen 0.9s linear infinite;
+    }
+
+    /* Punkte: eine einzige Animation, je Punkt um 0,15s versetzt –
+       daraus entsteht die Welle */
+    @keyframes pulsieren {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40%           { transform: scale(1);   opacity: 1; }
+    }
+
+    .punkte span {
+      animation: pulsieren 1.2s ease-in-out infinite;
+    }
+
+    .punkte span:nth-child(2) { animation-delay: 0.15s; }
+    .punkte span:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Barrierefreiheit: Ladeanzeigen tragen Information.
+       Deshalb nicht abschalten, sondern verlangsamen (siehe 08). */
+    @media (prefers-reduced-motion: reduce) {
+      .spinner { animation-duration: 2s; }
+      .punkte span { animation-duration: 2.4s; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="13-akkordeon.html" rel="prev" aria-label="Vorherige Szene: 13 · Akkordeon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 13</a>
+      <a href="15-karte-3d.html" rel="next" aria-label="Nächste Szene: 15 · Karte umdrehen (3D)">15 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <div class="lader">
+        <!-- role="status": Screenreader erfahren, dass etwas lädt -->
+        <div class="spinner" role="status" aria-label="Wird geladen"></div>
+
+        <div class="punkte" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>14 · Ladeindikatoren</h1>
+      <h2>Was passiert</h2>
+      <p>Zwei typische Ladeanzeigen: Ein Ring dreht sich, drei Punkte pulsieren nacheinander. Beide laufen endlos.</p>
+      <h2>Neu gegenüber 13</h2>
+      <p>Endlosschleifen ohne Auslöser wie in Serie 1, jetzt für die Oberfläche. <code>rotate()</code> mit <code>linear</code> dreht gleichmäßig, ohne zu stocken. Die Welle der Punkte entsteht aus einer einzigen Animation, die per <code>animation-delay</code> versetzt startet. Bei reduzierter Bewegung laufen beide langsamer statt gar nicht, weil sie Information tragen.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> drehen {
+  <span class="c-selektor">to</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">rotate(360deg)</span>; }
+}
+
+<span class="c-selektor">.spinner</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">drehen 0.9s linear infinite</span>;
+}
+
+<span class="c-selektor">.punkte span</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">pulsieren 1.2s ease-in-out infinite</span>;
+}
+<span class="c-selektor">.punkte span:nth-child(2)</span> { <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">0.15s</span>; }
+<span class="c-selektor">.punkte span:nth-child(3)</span> { <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">0.3s</span>; }</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

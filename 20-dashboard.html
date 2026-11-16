@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>20 · Dashboard-Kacheln</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    .kachel-etikett {
+      font-size: 0.8em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .kachel-zahl {
+      font-size: 1.7em;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .saeule-tag {
+      font-size: 0.8em;
+      text-align: center;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .kachel {
+      background: #f4f3ef;
+    }
+
+    .kachel-etikett,
+    .saeule-tag {
+      color: #757575;
+    }
+
+    .saeule-balken {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .dashboard {
+      display: grid;
+      gap: 14px;
+      width: 640px;
+      margin-bottom: 48px;   /* Platz für die Steuerung darunter */
+    }
+
+    .kennzahlen {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .kachel {
+      display: grid;
+      gap: 0.3em;
+      padding: 0.9em 1.1em;
+      border-radius: 0.6em;
+    }
+
+    /* Säulendiagramm: sieben Spalten, Säulen stehen unten */
+    .saeulen {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      height: 150px;
+    }
+
+    .saeule {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 6px;
+    }
+
+    /* Höhe kommt aus dem HTML: style="--h: 85%" */
+    .saeule-balken {
+      align-self: end;
+      height: var(--h);
+      border-radius: 4px 4px 0 0;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 20 · Dashboard-Kacheln
+       Jede Kachel und jede Säule trägt im HTML ihre Nummer als Custom Property,
+       z. B. style="--i: 2". Die Verzögerung wird daraus berechnet:
+       eine Regel für alle – trotzdem erscheinen sie nacheinander.
+       Die Klasse .laeuft am Dashboard schaltet die Animationen ein. */
+
+    /* nur from: Das Ziel ist der normale Zustand */
+    @keyframes einblenden {
+      from { opacity: 0; transform: translateY(1em); }
+    }
+
+    .laeuft .kachel {
+      /* both: vor dem Start gilt schon der erste Keyframe – unsichtbar */
+      animation: einblenden 0.5s ease-out both;
+      animation-delay: calc(var(--i) * 0.12s);
+    }
+
+    /* Säulen wachsen von unten */
+    .saeule-balken {
+      transform-origin: 50% 100%;
+    }
+
+    @keyframes wachsen {
+      from { transform: scaleY(0); }
+    }
+
+    .laeuft .saeule-balken {
+      animation: wachsen 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      /* erst wenn die Diagramm-Kachel da ist, dann Säule für Säule */
+      animation-delay: calc(0.5s + var(--i) * 0.08s);
+    }
+
+    /* Barrierefreiheit: Das Einblenden ist Schmuck und kann entfallen */
+    @media (prefers-reduced-motion: reduce) {
+      .laeuft .kachel,
+      .laeuft .saeule-balken {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="19-benachrichtigung.html" rel="prev" aria-label="Vorherige Szene: 19 · Benachrichtigung"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 19</a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <div class="dashboard laeuft">
+        <div class="kennzahlen">
+          <div class="kachel" style="--i: 0">
+            <span class="kachel-etikett">Besuche</span>
+            <span class="kachel-zahl">12.480</span>
+          </div>
+          <div class="kachel" style="--i: 1">
+            <span class="kachel-etikett">Konversion</span>
+            <span class="kachel-zahl">3,4 %</span>
+          </div>
+          <div class="kachel" style="--i: 2">
+            <span class="kachel-etikett">Umsatz</span>
+            <span class="kachel-zahl">48.250 €</span>
+          </div>
+        </div>
+
+        <div class="kachel" style="--i: 3">
+          <span class="kachel-etikett">Besuche je Wochentag</span>
+          <div class="saeulen">
+            <div class="saeule" style="--i: 0; --h: 55%"><span class="saeule-balken"></span><span class="saeule-tag">Mo</span></div>
+            <div class="saeule" style="--i: 1; --h: 70%"><span class="saeule-balken"></span><span class="saeule-tag">Di</span></div>
+            <div class="saeule" style="--i: 2; --h: 62%"><span class="saeule-balken"></span><span class="saeule-tag">Mi</span></div>
+            <div class="saeule" style="--i: 3; --h: 85%"><span class="saeule-balken"></span><span class="saeule-tag">Do</span></div>
+            <div class="saeule" style="--i: 4; --h: 100%"><span class="saeule-balken"></span><span class="saeule-tag">Fr</span></div>
+            <div class="saeule" style="--i: 5; --h: 40%"><span class="saeule-balken"></span><span class="saeule-tag">Sa</span></div>
+            <div class="saeule" style="--i: 6; --h: 32%"><span class="saeule-balken"></span><span class="saeule-tag">So</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="steuerung">
+        <button type="button" class="knopf-wiederholen">Wiederholen</button>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>20 · Dashboard-Kacheln</h1>
+      <h2>Was passiert</h2>
+      <p>Ein kleines Dashboard baut sich auf: Die Kacheln gleiten nacheinander herein, danach wachsen die Säulen des Diagramms eine nach der anderen.</p>
+      <h2>Neu gegenüber 19</h2>
+      <p>Staffelung ohne eine Regel je Element: Jede Kachel und jede Säule trägt ihre Nummer als Custom Property <code>--i</code>, die Verzögerung wird mit <code>calc()</code> daraus berechnet. Auch die Säulenhöhe kommt als <code>--h</code> aus dem HTML. Neu gestartet wird über die Klasse am Dashboard, wie in 19. Das schließt die Serie ab: Fast alles hier ist aus den vorigen Szenen zusammengesetzt.</p>
+      <h2>Bedienung</h2>
+      <p>„Wiederholen“ am unteren Rand der Bühne.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>HTML</h3>
+<pre><code><span class="c-selektor">&lt;div</span> <span class="c-eigenschaft">class</span>=<span class="c-wert">"kachel"</span> <span class="c-eigenschaft">style</span>=<span class="c-wert">"--i: 2"</span>&gt;…<span class="c-selektor">&lt;/div</span>&gt;
+<span class="c-selektor">&lt;div</span> <span class="c-eigenschaft">class</span>=<span class="c-wert">"saeule"</span> <span class="c-eigenschaft">style</span>=<span class="c-wert">"--i: 4; --h: 100%"</span>&gt;…<span class="c-selektor">&lt;/div</span>&gt;</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> einblenden {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">opacity</span>: <span class="c-wert">0</span>; <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(1em)</span>; }
+}
+<span class="c-selektor">.laeuft .kachel</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">einblenden 0.5s ease-out both</span>;
+  <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">calc(var(--i) * 0.12s)</span>;
+}
+
+<span class="c-at">@keyframes</span> wachsen {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">scaleY(0)</span>; }
+}
+<span class="c-selektor">.laeuft .saeule-balken</span> {
+  <span class="c-eigenschaft">height</span>: <span class="c-wert">var(--h)</span>;
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">wachsen 0.6s ease-out both</span>;
+  <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">calc(0.5s + var(--i) * 0.08s)</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Eine CSS-Animation startet nur neu, wenn sie vorher entfernt war:
+    // Klasse entfernen, den Browser den Zustand übernehmen lassen
+    // (offsetWidth lesen erzwingt das), Klasse wieder setzen.
+    function neuStarten(element, klasse) {
+      element.classList.remove(klasse);
+      void element.offsetWidth;
+      element.classList.add(klasse);
+    }
+
+    // Wiederholen: Die Klasse .laeuft am Dashboard kurz entfernen und neu setzen –
+    // damit starten alle Animationen darin von vorn
+    const dashboard = document.querySelector('.dashboard');
+
+    document.querySelector('.knopf-wiederholen').addEventListener('click', () => {
+      neuStarten(dashboard, 'laeuft');
+    });
+  </script>
+
+</body>
+</html>

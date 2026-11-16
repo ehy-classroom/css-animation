@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>13 · Akkordeon</title>
+
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    .akkordeon {
+      font-size: 1.05em;
+    }
+
+    /* Buttons erben Schrift und Ausrichtung nicht von selbst */
+    .eintrag-kopf {
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: 600;
+      text-align: left;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .akkordeon {
+      border-top-color: #d9d7d0;
+    }
+
+    .eintrag {
+      border-bottom-color: #d9d7d0;
+    }
+
+    .eintrag-kopf {
+      background: transparent;
+      color: inherit;
+    }
+
+    .eintrag-kopf:hover {
+      background: #f4f3ef;
+    }
+
+    .eintrag-kopf:focus-visible {
+      outline-color: #3d7eff;
+    }
+
+    .pfeil {
+      border-color: #1e1e1e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .akkordeon {
+      width: 30em;
+      border-top-style: solid;
+      border-top-width: 1px;
+    }
+
+    .eintrag {
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+    }
+
+    .eintrag-kopf {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1em;
+      width: 100%;
+      padding: 1em 0.75em;
+      border-style: none;
+      cursor: pointer;
+    }
+
+    .eintrag-kopf:focus-visible {
+      outline-style: solid;
+      outline-width: 3px;
+      outline-offset: -3px;
+    }
+
+    /* Pfeil: zwei Ränder eines kleinen Quadrats, um 45° gedreht – zeigt nach unten */
+    .pfeil {
+      flex-shrink: 0;
+      width: 0.55em;
+      height: 0.55em;
+      border-style: solid;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* Körper: ein Grid mit einer Zeile – deren Höhe wird animiert (siehe ANIMATION) */
+    .eintrag-koerper {
+      display: grid;
+      grid-template-rows: 0fr;
+    }
+
+    /* Inneres: schneidet ab, was über die Zeilenhöhe hinausgeht */
+    .eintrag-innen {
+      overflow: hidden;
+    }
+
+    .eintrag-innen p {
+      margin: 0;
+      padding: 0 0.75em 1.25em;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 13 · Akkordeon
+       Problem: height: auto lässt sich nicht animieren –
+       auto ist keine Zahl, zwischen der der Browser rechnen kann.
+       Trick: Der Körper ist ein Grid mit einer Zeile.
+       Deren Höhe lässt sich von 0fr (nichts) zu 1fr (so hoch wie der Inhalt) animieren. */
+
+    .eintrag-koerper {
+      transition: grid-template-rows 0.35s ease;
+    }
+
+    .eintrag.offen .eintrag-koerper {
+      grid-template-rows: 1fr;
+    }
+
+    /* Geschlossen auch für Tastatur und Screenreader ausblenden.
+       visibility springt bei einer transition erst am Ende um:
+       Beim Zuklappen bleibt der Text sichtbar, bis er verschwunden ist. */
+    .eintrag-innen {
+      visibility: hidden;
+      transition: visibility 0.35s;
+    }
+
+    .eintrag.offen .eintrag-innen {
+      visibility: visible;
+    }
+
+    /* Pfeil dreht sich mit: von 45° (unten) auf −135° (oben) */
+    .pfeil {
+      transition: transform 0.35s ease;
+    }
+
+    .eintrag.offen .pfeil {
+      transform: rotate(-135deg);
+    }
+
+    /* Neuere Alternative: interpolate-size: allow-keywords erlaubt,
+       height: auto direkt zu animieren – noch nicht in allen Browsern. */
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="12-schalter.html" rel="prev" aria-label="Vorherige Szene: 12 · Schalter"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 12</a>
+      <a href="14-ladeindikatoren.html" rel="next" aria-label="Nächste Szene: 14 · Ladeindikatoren">14 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <div class="akkordeon">
+        <div class="eintrag">
+          <button class="eintrag-kopf" type="button" aria-expanded="false" aria-controls="antwort-1">
+            Wann transition, wann animation?
+            <span class="pfeil" aria-hidden="true"></span>
+          </button>
+          <div class="eintrag-koerper" id="antwort-1">
+            <div class="eintrag-innen">
+              <p>transition: weicher Wechsel zwischen zwei Zuständen, braucht einen Auslöser. animation: eigener Ablauf mit Keyframes, läuft auch ohne Auslöser und kann sich wiederholen.</p>
+            </div>
+          </div>
+        </div>
+        <div class="eintrag">
+          <button class="eintrag-kopf" type="button" aria-expanded="false" aria-controls="antwort-2">
+            Welche Eigenschaften lassen sich gut animieren?
+            <span class="pfeil" aria-hidden="true"></span>
+          </button>
+          <div class="eintrag-koerper" id="antwort-2">
+            <div class="eintrag-innen">
+              <p>Vor allem transform und opacity. Der Browser verschiebt dann nur fertige Ebenen, statt das Layout neu zu berechnen (siehe 08).</p>
+            </div>
+          </div>
+        </div>
+        <div class="eintrag">
+          <button class="eintrag-kopf" type="button" aria-expanded="false" aria-controls="antwort-3">
+            Was bewirkt animation-fill-mode?
+            <span class="pfeil" aria-hidden="true"></span>
+          </button>
+          <div class="eintrag-koerper" id="antwort-3">
+            <div class="eintrag-innen">
+              <p>Es legt fest, was vor und nach der Animation gilt, zum Beispiel forwards: Der letzte Keyframe bleibt stehen (siehe 07).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>13 · Akkordeon</h1>
+      <h2>Was passiert</h2>
+      <p>Drei Fragen untereinander. Ein Klick klappt die Antwort weich auf, der Pfeil dreht sich mit. Ein weiterer Klick klappt sie wieder zu.</p>
+      <h2>Neu gegenüber 12</h2>
+      <p>Die Höhe <code>auto</code> lässt sich nicht animieren, weil der Browser zwischen einer Zahl und „auto“ nicht rechnen kann. Der Ausweg: ein Grid mit einer Zeile, deren Höhe von <code>0fr</code> auf <code>1fr</code> wechselt – das lässt sich animieren. Dazu dreht <code>rotate()</code> den Pfeil. Ein kurzes Skript setzt nur die Klasse <code>.offen</code> und meldet den Zustand an Screenreader.</p>
+      <h2>Bedienung</h2>
+      <p>Klick auf eine Frage, oder mit Tab ansteuern und Enter drücken.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.eintrag-koerper</span> {
+  <span class="c-eigenschaft">display</span>: <span class="c-wert">grid</span>;
+  <span class="c-eigenschaft">grid-template-rows</span>: <span class="c-wert">0fr</span>;
+  <span class="c-eigenschaft">transition</span>: <span class="c-wert">grid-template-rows 0.35s ease</span>;
+}
+
+<span class="c-selektor">.eintrag.offen .eintrag-koerper</span> {
+  <span class="c-eigenschaft">grid-template-rows</span>: <span class="c-wert">1fr</span>;
+}
+
+<span class="c-selektor">.eintrag-innen</span> {
+  <span class="c-eigenschaft">overflow</span>: <span class="c-wert">hidden</span>;
+}
+
+<span class="c-selektor">.eintrag.offen .pfeil</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">rotate(-135deg)</span>;
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JS</h3>
+<pre><code>kopf.addEventListener(<span class="c-wert">'click'</span>, () =&gt; {
+  <span class="c-at">const</span> offen = eintrag.classList.toggle(<span class="c-wert">'offen'</span>);
+  kopf.setAttribute(<span class="c-wert">'aria-expanded'</span>, offen);
+});</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Das Skript bewegt nichts selbst: Es setzt die Klasse .offen
+    // und meldet den Zustand über aria-expanded an Screenreader.
+    document.querySelectorAll('.eintrag-kopf').forEach((kopf) => {
+      kopf.addEventListener('click', () => {
+        const eintrag = kopf.parentElement;
+        // toggle gibt zurück, ob die Klasse jetzt gesetzt ist
+        const offen = eintrag.classList.toggle('offen');
+        kopf.setAttribute('aria-expanded', offen);
+      });
+    });
+  </script>
+
+</body>
+</html>

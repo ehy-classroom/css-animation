@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>09 · Grenze: CSS und GSAP</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+    .schatten {
+      background: #1e1e1e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    /* Bahn: trägt Ball und Schatten einer Hälfte und bewegt beide zur Seite */
+    .bahn {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 360px;
+      z-index: 1;            /* vor dem Horizont */
+    }
+
+    .ball {
+      /* Ausgangslage: mittig in der Hälfte, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 148px;           /* (360 - 64) / 2 */
+      z-index: 1;            /* vor dem Schatten */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+    /* Schatten: flache Ellipse auf dem Boden, genau unter dem Aufsetzpunkt (336px) */
+    .schatten {
+      position: absolute;
+      top: 330px;
+      left: 148px;
+      width: 64px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .bahn-css  { left: 0; }
+    .bahn-gsap { left: 360px; }
+
+    /* Bezugspunkt für die Verformung: unten in der Mitte, auf beiden Seiten */
+    .ball {
+      transform-origin: 50% 100%;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 09 · Grenze: der ausschwingende Sprung
+       Der Ball fällt, springt immer niedriger nach, staucht sich bei jedem Aufprall,
+       rollt dabei zur Seite aus und bleibt liegen. Der Schatten folgt.
+       Links nur CSS, rechts GSAP – beide Hälften zeigen dieselbe Bewegung. */
+
+
+    /* --- links: nur CSS ---
+       Jeder Aufprall, jede Stauchung und jeder Scheitelpunkt ist ein eigener Keyframe,
+       mit passendem Easing. Die Zeitpunkte folgen grob der Fallzeit (Wurzel der Höhe).
+       Das geht, ist aber Handarbeit – und jede Änderung an Höhe oder Zahl der Sprünge
+       heißt: alles neu rechnen, beim Ball und beim Schatten. */
+
+    @keyframes ausschwingen {
+      0%    { transform: translateY(0)     scale(1, 1);       animation-timing-function: ease-in;  }  /* Start */
+      25%   { transform: translateY(144px) scale(1, 1);       animation-timing-function: linear;   }  /* 1. Aufprall */
+      27%   { transform: translateY(144px) scale(1.4, 0.6);   animation-timing-function: linear;   }  /* Squash */
+      29%   { transform: translateY(144px) scale(0.8, 1.25);  animation-timing-function: ease-out; }  /* Stretch */
+      45%   { transform: translateY(80px)  scale(1, 1);       animation-timing-function: ease-in;  }  /* 1. Scheitel, 64px */
+      60%   { transform: translateY(144px) scale(1, 1);       animation-timing-function: linear;   }  /* 2. Aufprall */
+      62%   { transform: translateY(144px) scale(1.25, 0.75); animation-timing-function: linear;   }
+      64%   { transform: translateY(144px) scale(0.9, 1.1);   animation-timing-function: ease-out; }
+      74%   { transform: translateY(116px) scale(1, 1);       animation-timing-function: ease-in;  }  /* 2. Scheitel, 28px */
+      85%   { transform: translateY(144px) scale(1, 1);       animation-timing-function: linear;   }  /* 3. Aufprall */
+      86.5% { transform: translateY(144px) scale(1.12, 0.88); animation-timing-function: linear;   }
+      88%   { transform: translateY(144px) scale(1, 1);       animation-timing-function: ease-out; }
+      93%   { transform: translateY(134px) scale(1, 1);       animation-timing-function: ease-in;  }  /* 3. Scheitel, 10px */
+      100%  { transform: translateY(144px) scale(1, 1); }                                             /* liegt */
+    }
+
+    /* Schatten: dieselben Zeitpunkte noch einmal, Größe passend zur Höhe des Balls */
+    @keyframes schatten-ausschwingen {
+      0%    { transform: scale(0.5);    opacity: 0.1;  animation-timing-function: ease-in;  }
+      25%   { transform: scale(1);      opacity: 0.35; animation-timing-function: linear;   }
+      27%   { transform: scale(1.4, 1); opacity: 0.4;  animation-timing-function: linear;   }
+      29%   { transform: scale(1);      opacity: 0.35; animation-timing-function: ease-out; }
+      45%   { transform: scale(0.78);   opacity: 0.24; animation-timing-function: ease-in;  }
+      60%   { transform: scale(1);      opacity: 0.35; animation-timing-function: linear;   }
+      62%   { transform: scale(1.25, 1); opacity: 0.38; animation-timing-function: linear;  }
+      64%   { transform: scale(1);      opacity: 0.35; animation-timing-function: ease-out; }
+      74%   { transform: scale(0.9);    opacity: 0.3;  animation-timing-function: ease-in;  }
+      85%   { transform: scale(1);      opacity: 0.35; animation-timing-function: linear;   }
+      86.5% { transform: scale(1.12, 1); opacity: 0.37; animation-timing-function: linear;  }
+      88%   { transform: scale(1);      opacity: 0.35; animation-timing-function: ease-out; }
+      93%   { transform: scale(0.97);   opacity: 0.34; animation-timing-function: ease-in;  }
+      100%  { transform: scale(1);      opacity: 0.35; }
+    }
+
+    /* Ausrollen: zur Seite, immer langsamer */
+    @keyframes ausrollen {
+      from { transform: translateX(-100px); }
+      to   { transform: translateX(60px); }
+    }
+
+    /* Dauer 1,5s, Verzögerung 1s.
+       both: vor dem Start gilt der erste Keyframe, nach dem Ende der letzte. */
+    .bahn-css .ball     { animation: ausschwingen 1.5s 1s both; }
+    .bahn-css .schatten { animation: schatten-ausschwingen 1.5s 1s both; }
+    .bahn-css           { animation: ausrollen 1.5s ease-out 1s both; }
+
+    /* Mit CSS ginge die Fallbewegung auch über die Easing-Funktion linear(),
+       die Stützpunkte (Fortschritt, Zeitpunkt) verbindet, z. B.
+         linear(0, 1 25%, 0.56 45%, 1 60%, 0.81 74%, 1 85%, 0.93 93%, 1)
+       Ohne Easing dazwischen wirkt das eckig; für eine runde Kurve braucht es
+       viele Zwischenpunkte. Die Stauchung bleibt trotzdem Handarbeit. */
+
+
+    /* --- rechts: GSAP ---
+       Die Bewegung steht im <script> am Ende der Datei. */
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="08-performance-a11y.html" rel="prev" aria-label="Vorherige Szene: 08 · Performance und Barrierefreiheit"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 08</a>
+      <a href="10-scroll-ausblick.html" rel="next" aria-label="Nächste Szene: 10 · Ausblick: Scroll">10 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne geteilt">
+      <!-- links: nur CSS -->
+      <div class="bahn bahn-css">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+
+      <!-- rechts: GSAP -->
+      <div class="bahn bahn-gsap">
+        <div class="schatten"></div>
+        <div class="ball"></div>
+      </div>
+
+      <div class="steuerung">
+        <button type="button" class="knopf-wiederholen">Wiederholen</button>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>09 · Grenze: CSS und GSAP</h1>
+      <h2>Was passiert</h2>
+      <p>Beide Bälle fallen, springen immer niedriger nach, stauchen sich bei jedem Aufprall, rollen dabei zur Seite aus und bleiben liegen. Der Schatten folgt. Links reines CSS, rechts die JavaScript-Bibliothek GSAP.</p>
+      <h2>Neu gegenüber 08</h2>
+      <p>Hier wird CSS mühsam: Links musste jeder Aufprall, jede Stauchung und jeder Scheitelpunkt als eigener Keyframe berechnet werden – für den Ball und noch einmal für den Schatten. Rechts erzeugt GSAP ein Sprung-Easing samt passender Stauchung (<code>CustomBounce</code>), eine Timeline legt alle Bewegungen auf eine gemeinsame Zeitachse. Eine Bibliothek lohnt sich bei langen Abfolgen, vielen Elementen und Steuerung zur Laufzeit – um den Preis einer zusätzlichen Abhängigkeit.</p>
+      <h2>Bedienung</h2>
+      <p>„Wiederholen“ lädt die Seite neu. Braucht eine Internetverbindung, weil GSAP nachgeladen wird.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> ausschwingen {
+  <span class="c-selektor">0%</span>  { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(0) scale(1, 1)</span>; }
+  <span class="c-selektor">25%</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(1, 1)</span>; }
+  <span class="c-selektor">27%</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(1.4, 0.6)</span>; }
+  <span class="c-selektor">29%</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(0.8, 1.25)</span>; }
+  <span class="c-selektor">45%</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(80px) scale(1, 1)</span>; }
+  <span class="c-kommentar">/* … 9 weitere Stufen, dazu Easing je Stufe
+     und alles noch einmal für den Schatten */</span>
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JS</h3>
+<pre><code>CustomBounce.create(<span class="c-wert">'aufprall'</span>, {
+  <span class="c-eigenschaft">strength</span>: <span class="c-zahl">0.6</span>,
+  <span class="c-eigenschaft">squash</span>: <span class="c-zahl">2</span>,
+  <span class="c-eigenschaft">squashID</span>: <span class="c-wert">'aufprall-squash'</span>
+});
+
+gsap.timeline({ <span class="c-eigenschaft">delay</span>: <span class="c-zahl">1</span>, <span class="c-eigenschaft">defaults</span>: { <span class="c-eigenschaft">duration</span>: <span class="c-zahl">1.5</span> } })
+  .to(ball, { <span class="c-eigenschaft">y</span>: <span class="c-zahl">144</span>, <span class="c-eigenschaft">ease</span>: <span class="c-wert">'aufprall'</span> }, <span class="c-zahl">0</span>)
+  .to(ball, { <span class="c-eigenschaft">scaleX</span>: <span class="c-zahl">1.4</span>, <span class="c-eigenschaft">scaleY</span>: <span class="c-zahl">0.6</span>,
+              <span class="c-eigenschaft">ease</span>: <span class="c-wert">'aufprall-squash'</span> }, <span class="c-zahl">0</span>)
+  .to(schatten, { <span class="c-eigenschaft">scale</span>: <span class="c-zahl">1</span>, <span class="c-eigenschaft">ease</span>: <span class="c-wert">'aufprall'</span> }, <span class="c-zahl">0</span>)
+  .to(bahn, { <span class="c-eigenschaft">x</span>: <span class="c-zahl">60</span>, <span class="c-eigenschaft">ease</span>: <span class="c-wert">'power2.out'</span> }, <span class="c-zahl">0</span>);</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <!-- GSAP: JavaScript-Bibliothek für Animationen, hier von einem CDN geladen.
+       Version fest angegeben, damit sich das Beispiel nicht unbemerkt ändert.
+       CustomBounce baut auf CustomEase auf; beide sind Plugins von GSAP.
+       Lizenz: gsap.com/standard-license -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomBounce.min.js"></script>
+
+  <script>
+    // Plugins bei GSAP anmelden
+    gsap.registerPlugin(CustomEase, CustomBounce);
+
+    const ball = document.querySelector('.bahn-gsap .ball');
+    const schatten = document.querySelector('.bahn-gsap .schatten');
+    const bahn = document.querySelector('.bahn-gsap');
+
+    // Ein eigenes Sprung-Easing:
+    //   strength = wie stark der Ball nachspringt (0 bis 1)
+    //   squash   = wie lange er beim Aufprall gestaucht bleibt
+    //   squashID = Name eines zweiten, passenden Easings für die Stauchung.
+    // Zahl und Zeitpunkte der Aufpralle rechnet GSAP selbst aus.
+    CustomBounce.create('aufprall', {
+      strength: 0.6,
+      squash: 2,
+      squashID: 'aufprall-squash'
+    });
+
+    // Ausgangszustand wie beim CSS-Ball
+    gsap.set(ball, { transformOrigin: '50% 100%' });
+    gsap.set(schatten, { scale: 0.5, opacity: 0.1 });
+    gsap.set(bahn, { x: -100 });
+
+    // Timeline: mehrere Tweens auf einer gemeinsamen Zeitachse.
+    // delay und duration gelten für alle; die 0 am Ende heißt: alle starten gleichzeitig.
+    gsap.timeline({ delay: 1, defaults: { duration: 1.5 } })
+      .to(ball, { y: 144, ease: 'aufprall' }, 0)                                     // fallen und nachspringen
+      .to(ball, { scaleX: 1.4, scaleY: 0.6, ease: 'aufprall-squash' }, 0)           // stauchen bei jedem Aufprall
+      .to(schatten, { scale: 1, opacity: 0.35, ease: 'aufprall' }, 0)               // Schatten folgt der Höhe
+      .to(bahn, { x: 60, ease: 'power2.out' }, 0);                                  // ausrollen
+
+    // Wiederholen: Am einfachsten lädt man die Seite neu.
+    // GSAP könnte selbst neu starten (timeline.restart()),
+    // eine CSS-Animation nur über einen Umweg (Klasse entfernen und neu setzen).
+    document.querySelector('.knopf-wiederholen').addEventListener('click', () => {
+      location.reload();
+    });
+  </script>
+
+</body>
+</html>

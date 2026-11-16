@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>01 · transition</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+    /* sichtbarer Rahmen bei Tastaturbedienung */
+    .ball:focus-visible {
+      outline-color: #3d7eff;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Horizont */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+
+      /* Der Ball ist ein <button>: Browser-Vorgaben zurücksetzen */
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    /* sichtbarer Rahmen bei Tastaturbedienung */
+    .ball:focus-visible {
+      outline-style: solid;
+      outline-width: 3px;
+      outline-offset: 4px;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 01 · transition
+       weicher Wechsel zwischen zwei Zuständen
+       Zustand 1: Ball schwebt (Ausgangslage oben)
+       Zustand 2: Ball liegt auf dem Boden (Klasse .unten)
+       Ein Klick auf den Ball wechselt zwischen beiden Zuständen. */
+
+    .ball {
+      /* Die transition steht beim Ausgangszustand.
+         So wirkt sie in beide Richtungen: beim Fallen und beim Steigen. */
+      transition-property: transform;     /* welche Eigenschaft weich wechselt */
+      transition-duration: 0.6s;          /* wie lange der Wechsel dauert */
+      transition-timing-function: linear; /* Tempoverlauf: gleichmäßig, ohne Beschleunigung */
+      transition-delay: 0s;               /* Wartezeit vor dem Start */
+
+      /* Kurzschreibweise, gleichwertig:
+         transition: transform 0.6s linear; */
+    }
+
+    /* Zielzustand: Die Klasse .unten setzt das Skript beim Klick.
+       Ohne einen solchen Auslöser gibt es bei transition keine Bewegung. */
+    .ball.unten {
+      /* 144px nach unten: Unterkante des Balls bei 336px,
+         also 36px vor dem Horizont auf dem Boden.
+         transform verschiebt nur die Darstellung; das Layout bleibt unberührt. */
+      transform: translateY(144px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="02-keyframes.html" rel="next" aria-label="Nächste Szene: 02 · @keyframes">02 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <!-- <button>: per Maus und per Tastatur (Tab, dann Leertaste oder Enter) bedienbar -->
+      <button class="ball" type="button" aria-label="Ball"></button>
+    </div>
+
+    <section class="beschreibung">
+      <h1>01 · transition</h1>
+      <h2>Was passiert</h2>
+      <p>Ein Klick auf den Ball lässt ihn auf den Boden fallen, ein weiterer Klick lässt ihn wieder steigen. Die Bewegung ist gleichmäßig schnell.</p>
+      <h2>Worum es geht</h2>
+      <p>Eine <code>transition</code> macht den Wechsel zwischen zwei Zuständen weich. Sie braucht einen Auslöser – hier setzt ein Klick eine Klasse – und kennt nur Start und Ziel.</p>
+      <h2>Bedienung</h2>
+      <p>Klick auf den Ball, oder Tab und Leertaste.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">transition-property</span>: <span class="c-wert">transform</span>;
+  <span class="c-eigenschaft">transition-duration</span>: <span class="c-wert">0.6s</span>;
+  <span class="c-eigenschaft">transition-timing-function</span>: <span class="c-wert">linear</span>;
+}
+
+<span class="c-selektor">.ball.unten</span> {
+  <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px)</span>;
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JS</h3>
+<pre><code>ball.addEventListener(<span class="c-wert">'click'</span>, () =&gt; {
+  ball.classList.toggle(<span class="c-wert">'unten'</span>);
+});</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Das Skript bewegt nichts selbst.
+    // Es schaltet nur die Klasse .unten an oder aus,
+    // die Bewegung dazwischen übernimmt die transition im CSS.
+    const ball = document.querySelector('.ball');
+
+    ball.addEventListener('click', () => {
+      // toggle: Klasse hinzufügen, wenn sie fehlt; entfernen, wenn sie da ist
+      ball.classList.toggle('unten');
+    });
+  </script>
+
+</body>
+</html>

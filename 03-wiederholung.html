@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>03 · Wiederholen und Richtung</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Horizont */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 03 · Wiederholen und Richtung
+       Dieselben Keyframes wie in 02, aber endlos und hin und zurück.
+       Die Bewegung wirkt noch mechanisch: Das Tempo ist überall gleich. */
+
+    @keyframes fallen {
+      from { transform: translateY(0); }
+      to   { transform: translateY(144px); }
+    }
+
+    .ball {
+      animation-name: fallen;
+      animation-duration: 0.6s;
+      animation-timing-function: linear;
+
+      /* Wiederholung und Richtung gehören zur Animation, nicht zu den Keyframes */
+      animation-iteration-count: infinite;  /* wie oft: Zahl oder endlos */
+      animation-direction: alternate;       /* jeder zweite Durchlauf rückwärts: fallen, steigen, fallen … */
+
+      /* ohne alternate (normal) springt der Ball nach jedem Durchlauf
+         zurück nach oben und fällt erneut */
+    }
+
+    /* Kurzschreibweise, gleichwertig zum Block oben:
+       .ball {
+         animation: fallen 0.6s linear infinite alternate;
+       }
+       Die erste Zeitangabe ist immer die Dauer, eine zweite wäre die Verzögerung. */
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="02-keyframes.html" rel="prev" aria-label="Vorherige Szene: 02 · @keyframes"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 02</a>
+      <a href="04-easing.html" rel="next" aria-label="Nächste Szene: 04 · Easing">04 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="ball"></div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>03 · Wiederholen und Richtung</h1>
+      <h2>Was passiert</h2>
+      <p>Der Ball fällt und steigt endlos, immer gleich schnell. Das wirkt mechanisch, wie an einem Faden gezogen.</p>
+      <h2>Neu gegenüber 02</h2>
+      <p>Die Animation läuft endlos (<code>animation-iteration-count</code>), und jeder zweite Durchlauf läuft rückwärts (<code>animation-direction: alternate</code>). Dazu die Kurzschreibweise <code>animation</code>, die alle Angaben in einer Zeile zusammenfasst.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> fallen {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(0)</span>; }
+  <span class="c-selektor">to</span>   { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px)</span>; }
+}
+
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation-name</span>: <span class="c-wert">fallen</span>;
+  <span class="c-eigenschaft">animation-duration</span>: <span class="c-wert">0.6s</span>;
+  <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">linear</span>;
+  <span class="c-eigenschaft">animation-iteration-count</span>: <span class="c-wert">infinite</span>;
+  <span class="c-eigenschaft">animation-direction</span>: <span class="c-wert">alternate</span>;
+}
+
+<span class="c-kommentar">/* Kurzschreibweise */</span>
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">fallen 0.6s linear infinite alternate</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

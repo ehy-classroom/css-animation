@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>05 · Squash and Stretch</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Horizont, Navigation, Codefenster)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    .ball {
+      background: #e4572e;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    .ball {
+      /* Ausgangslage: mittig, Oberkante 128px von oben */
+      position: absolute;
+      top: 128px;
+      left: 328px;           /* (720 - 64) / 2 */
+      z-index: 1;            /* vor dem Horizont */
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;    /* aus dem Quadrat wird ein Kreis */
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 05 · Zwischenstufen: Squash and Stretch
+       Ein ganzer Sprung – Fallen, Aufprall, Steigen – in einer Keyframe-Folge.
+       Prozentangaben legen fest, wann innerhalb der Dauer ein Zustand erreicht ist.
+       Squash and Stretch (Stauchen und Strecken) ist ein Grundprinzip
+       des Trickfilms: Verformung macht Gewicht und Elastizität sichtbar. */
+
+    @keyframes huepfen {
+      /* oben: rund. Das Easing gilt jeweils bis zum nächsten Keyframe:
+         ease-in = Fall beschleunigt. Im Fall bleibt der Ball rund. */
+      0%, 100% {
+        transform: translateY(0) scale(1, 1);
+        animation-timing-function: ease-in;
+      }
+      /* Aufprall: Der Ball berührt den Boden, noch rund */
+      45% {
+        transform: translateY(144px) scale(1, 1);
+        animation-timing-function: linear;
+      }
+      /* Squash: stark gestaucht, breit und flach */
+      50% {
+        transform: translateY(144px) scale(1.4, 0.6);
+        animation-timing-function: linear;
+      }
+      /* Stretch: Der Ball streckt sich nach oben und stößt sich ab.
+         ease-out = Steigen bremst ab. Auf dem Weg nach oben
+         wird er bis zum Scheitelpunkt wieder rund. */
+      55% {
+        transform: translateY(144px) scale(0.7, 1.4);
+        animation-timing-function: ease-out;
+      }
+    }
+
+    .ball {
+      animation: huepfen 1.2s infinite;
+
+      /* Bezugspunkt für scale(): unten in der Mitte.
+         So verformt sich der Ball vom Boden aus und hebt nicht ab.
+         Standard wäre die Mitte (50% 50%). */
+      transform-origin: 50% 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige und nächste Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="04-easing.html" rel="prev" aria-label="Vorherige Szene: 04 · Easing"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 04</a>
+      <a href="06-kombination.html" rel="next" aria-label="Nächste Szene: 06 · Animationen kombinieren">06 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne">
+      <div class="ball"></div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>05 · Squash and Stretch</h1>
+      <h2>Was passiert</h2>
+      <p>Der Ball fällt rund, staucht sich beim Aufprall stark und streckt sich beim Absprung weit nach oben. Auf dem Weg zum Scheitelpunkt wird er wieder rund.</p>
+      <h2>Neu gegenüber 04</h2>
+      <p>Statt <code>from</code> und <code>to</code> beschreibt eine Folge von Prozent-Keyframes den ganzen Sprung, mit eigenem Easing je Abschnitt. Die Verformung entsteht mit <code>scale()</code>; <code>transform-origin</code> legt den Bezugspunkt an den Fuß des Balls. Gestaucht wird beim Aufprall, gestreckt beim Absprung – im Fall bleibt der Ball rund. Stauchen und Strecken ist ein Grundprinzip des Trickfilms.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-at">@keyframes</span> huepfen {
+  <span class="c-selektor">0%, 100%</span> {
+    <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(0) scale(1, 1)</span>;
+    <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">ease-in</span>;
+  }
+  <span class="c-selektor">45%</span> {
+    <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(1, 1)</span>;
+    <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">linear</span>;
+  }
+  <span class="c-selektor">50%</span> {
+    <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(1.4, 0.6)</span>;
+    <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">linear</span>;
+  }
+  <span class="c-selektor">55%</span> {
+    <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateY(144px) scale(0.7, 1.4)</span>;
+    <span class="c-eigenschaft">animation-timing-function</span>: <span class="c-wert">ease-out</span>;
+  }
+}
+
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">huepfen 1.2s infinite</span>;
+  <span class="c-eigenschaft">transform-origin</span>: <span class="c-wert">50% 100%</span>;
+}</code></pre>
+      </div>
+    </aside>
+  </main>
+
+</body>
+</html>

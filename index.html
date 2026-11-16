@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSS-Animation · Bouncing Ball</title>
+
+  <!-- Schrift: Inter von Rasmus Andersson, direkt von seiner Seite -->
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+  <style>
+    /* Übersicht aller Szenen */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    :root {
+      font-family: Inter, sans-serif;
+      font-feature-settings: "liga" 1, "calt" 1;
+    }
+
+    /* variable Fassung, wo der Browser sie kann */
+    @supports (font-variation-settings: normal) {
+      :root {
+        font-family: InterVariable, sans-serif;
+      }
+    }
+
+    body {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    h1 {
+      font-size: 2em;
+      line-height: 1.2;
+    }
+
+    /* Serie */
+    h2 {
+      font-size: 1.4em;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* Gruppe innerhalb einer Serie */
+    h3 {
+      font-size: 0.8125em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .szenen a {
+      text-decoration: none;
+    }
+
+    .nummer {
+      font-size: 1.5em;
+      font-weight: 700;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .titel {
+      font-weight: 600;
+    }
+
+    .kurz {
+      font-size: 0.875em;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    body {
+      background: #ecebe6;
+      color: #1e1e1e;
+    }
+
+    .einleitung,
+    h3 {
+      color: #757575;
+    }
+
+    .szenen a {
+      background: #ffffff;
+      color: inherit;
+    }
+
+    .szenen a:hover {
+      outline-color: #e4572e;
+    }
+
+    .szenen a:focus-visible {
+      outline-color: #3d7eff;
+    }
+
+    /* Szenennummer im Ballrot */
+    .nummer {
+      color: #e4572e;
+    }
+
+    .kurz {
+      color: #555555;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    body {
+      margin: 0;
+    }
+
+    .seite {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 56px 24px 72px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+    }
+
+    .einleitung {
+      margin: 0 0 40px;
+    }
+
+    h2 {
+      margin: 72px 0 0;
+    }
+
+    .einleitung + h2 {
+      margin-top: 0;
+    }
+
+    h3 {
+      margin: 32px 0 12px;
+    }
+
+    /* Szenen als Kacheln: zwei Spalten, auf schmalen Bildschirmen eine */
+    .szenen {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .szenen a {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 4px 12px;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 16px 20px;
+      border-radius: 8px;
+    }
+
+    .szenen a:hover {
+      outline-style: solid;
+      outline-width: 2px;
+    }
+
+    .szenen a:focus-visible {
+      outline-style: solid;
+      outline-width: 3px;
+      outline-offset: 2px;
+    }
+
+    /* Szenennummer über beide Zeilen */
+    .nummer {
+      grid-row: span 2;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="seite">
+    <h1>CSS-Animation</h1>
+    <p class="einleitung">Zwei Serien mit je zehn Szenen. Jede Szene baut auf der vorigen auf.</p>
+
+    <h2>Serie 1 · Bouncing Ball</h2>
+
+    <h3>A · Grundlagen</h3>
+    <ul class="szenen">
+      <li><a href="01-transition.html"><span class="nummer">01</span><span class="titel">transition</span><span class="kurz">Wechsel zwischen zwei Zuständen per Klick</span></a></li>
+      <li><a href="02-keyframes.html"><span class="nummer">02</span><span class="titel">@keyframes</span><span class="kurz">Bewegung ohne Auslöser</span></a></li>
+      <li><a href="03-wiederholung.html"><span class="nummer">03</span><span class="titel">Wiederholen und Richtung</span><span class="kurz">endlos, hin und zurück</span></a></li>
+    </ul>
+
+    <h3>B · Glaubwürdige Bewegung</h3>
+    <ul class="szenen">
+      <li><a href="04-easing.html"><span class="nummer">04</span><span class="titel">Easing</span><span class="kurz">Schwerkraft über den Tempoverlauf</span></a></li>
+      <li><a href="05-squash-stretch.html"><span class="nummer">05</span><span class="titel">Squash and Stretch</span><span class="kurz">Prozent-Keyframes und Verformung</span></a></li>
+      <li><a href="06-kombination.html"><span class="nummer">06</span><span class="titel">Animationen kombinieren</span><span class="kurz">Ball, Schatten und Bahn synchron</span></a></li>
+    </ul>
+
+    <h3>C · Steuerung und Qualität</h3>
+    <ul class="szenen">
+      <li><a href="07-steuerung.html"><span class="nummer">07</span><span class="titel">Steuern und Endzustand</span><span class="kurz">Buttons: anhalten, landen, abspringen</span></a></li>
+      <li><a href="08-performance-a11y.html"><span class="nummer">08</span><span class="titel">Performance und Barrierefreiheit</span><span class="kurz">Layout-Eigenschaften gegen transform, reduzierte Bewegung</span></a></li>
+    </ul>
+
+    <h3>D · Grenzen und Ausblick</h3>
+    <ul class="szenen">
+      <li><a href="09-grenze-gsap.html"><span class="nummer">09</span><span class="titel">Grenze: CSS und GSAP</span><span class="kurz">ausschwingender Sprung mit Squash: CSS gegen GSAP</span></a></li>
+      <li><a href="10-scroll-ausblick.html"><span class="nummer">10</span><span class="titel">Ausblick: Scroll</span><span class="kurz">die ganze Szene im Takt des Scrollens</span></a></li>
+    </ul>
+
+    <h2>Serie 2 · UI und Dashboard</h2>
+
+    <h3>E · Interaktion</h3>
+    <ul class="szenen">
+      <li><a href="11-button.html"><span class="nummer">11</span><span class="titel">Button</span><span class="kurz">Hover, Klick und Fokus mit mehreren Übergängen</span></a></li>
+      <li><a href="12-schalter.html"><span class="nummer">12</span><span class="titel">Schalter</span><span class="kurz">Toggle mit :checked, ohne Skript</span></a></li>
+      <li><a href="13-akkordeon.html"><span class="nummer">13</span><span class="titel">Akkordeon</span><span class="kurz">Höhe auf auto animieren, Pfeil dreht sich</span></a></li>
+    </ul>
+
+    <h3>F · Drehen und Füllen</h3>
+    <ul class="szenen">
+      <li><a href="14-ladeindikatoren.html"><span class="nummer">14</span><span class="titel">Ladeindikatoren</span><span class="kurz">Spinner und gestaffelt pulsierende Punkte</span></a></li>
+      <li><a href="15-karte-3d.html"><span class="nummer">15</span><span class="titel">Karte umdrehen (3D)</span><span class="kurz">perspective, preserve-3d, backface-visibility</span></a></li>
+      <li><a href="16-fortschritt.html"><span class="nummer">16</span><span class="titel">Fortschrittsbalken</span><span class="kurz">scaleX statt width, bestimmt und unbestimmt</span></a></li>
+      <li><a href="17-ringanzeige.html"><span class="nummer">17</span><span class="titel">Ringanzeige mit Zähler</span><span class="kurz">SVG-Strich und Zahl über @property</span></a></li>
+      <li><a href="18-uhr.html"><span class="nummer">18</span><span class="titel">Analoge Uhr</span><span class="kurz">Drehpunkt, steps(60), echte Uhrzeit</span></a></li>
+    </ul>
+
+    <h3>G · Zusammenspiel</h3>
+    <ul class="szenen">
+      <li><a href="19-benachrichtigung.html"><span class="nummer">19</span><span class="titel">Benachrichtigung</span><span class="kurz">Glocke, Badge und Toast auf einen Auslöser</span></a></li>
+      <li><a href="20-dashboard.html"><span class="nummer">20</span><span class="titel">Dashboard-Kacheln</span><span class="kurz">gestaffelt über Custom Properties</span></a></li>
+    </ul>
+  </main>
+
+</body>
+</html>
