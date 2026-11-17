@@ -60,9 +60,41 @@ Kurzschreibweise, gleichwertig:
 }
 ```
 
+### Werte für `transition-property`
+
+| Wert | Bedeutung |
+|---|---|
+| `all` | alle animierbaren Eigenschaften (Voreinstellung) |
+| `none` | keine Transition |
+| Eigenschaftsnamen | eine oder mehrere, mit Komma getrennt: `transform`, `opacity`, `background-color`, `box-shadow` … |
+| Custom Property | z. B. `--wert`; gleitet nur, wenn sie mit `@property` einen Typ bekommen hat, sonst springt sie |
+
+Gleiten können nur Eigenschaften mit Zwischenwerten: Zahlen, Längen, Prozente, Farben, Transformationen, Schatten. Auch dann nur, wenn beide Werte zueinander passen: Ein Schatten mit `inset` und einer ohne lassen sich nicht ineinander überführen. Eigenschaften ohne Zwischenwerte (z. B. `display`) wechseln schlagartig; dafür gibt es neuerdings `transition-behavior: allow-discrete` (siehe Abschnitt 11).
+
+### Werte für `transition-timing-function`
+
+| Wert | Bedeutung |
+|---|---|
+| `ease` | zügig an, sanft aus (Voreinstellung) |
+| `linear` | gleichmäßig |
+| `ease-in` | langsam an, schnell aus |
+| `ease-out` | schnell an, langsam aus |
+| `ease-in-out` | langsam an und aus |
+| `cubic-bezier(x1, y1, x2, y2)` | eigene Bézierkurve; x-Werte zwischen 0 und 1, y-Werte auch darüber oder darunter (Überschwingen) |
+| `steps(n, richtung)` | n Sprünge statt Gleiten; Richtung `jump-end` bzw. `end` (Voreinstellung), `jump-start` bzw. `start`, `jump-none` (dann mindestens 2 Stufen), `jump-both` |
+| `step-start`, `step-end` | Kurzform für `steps(1, start)` und `steps(1, end)`: ein einziger Sprung am Anfang oder Ende |
+| `linear(…)` | Kurve aus Stützpunkten, z. B. `linear(0, 0.6 40%, 1)`; erst in Level 2 der Easing-Spezifikation |
+
+Bei mehreren Eigenschaften gehören die Timing-Funktionen der Reihe nach zu den Einträgen in `transition-property`. Wie die Verläufe wirken und wofür sie passen: Abschnitt 5.
+
+Quellen der Werte: [CSS Transitions Level 1](https://www.w3.org/TR/css-transitions-1/) (Working Draft, 8. Januar 2026), [CSS Easing Functions Level 2](https://drafts.csswg.org/css-easing-2/) (Editor’s Draft, 23. Februar 2026), abgerufen am 16.11.2026.
+
 Wichtig:
 
-- **Die Transition gehört an den Ausgangszustand**, nicht an den Zielzustand. Dann wirkt sie in beide Richtungen: hin und zurück.
+- **Es gilt die Transition des Zustands, in den gewechselt wird.** Steht sie nur in der Grundregel (`.knopf`), gilt sie auch im `:hover`-Zustand weiter – also hin und zurück gleich. Das ist der übliche Fall.
+- Steht eine Transition **nur im Zielzustand** (`.knopf:hover`), gleitet das Element hinein, springt beim Verlassen aber ohne Übergang zurück. Meist ein Versehen.
+- Stehen **in beiden Zuständen unterschiedliche Werte**, laufen Hin- und Rückweg verschieden – bewusst eingesetzt etwa für ein schnelles Eindrücken und ein langsameres Lösen:
+  `.knopf { transition-duration: 0.2s; }` `.knopf:active { transition-duration: 0.05s; }`
 - **Mehrere Eigenschaften** werden mit Komma getrennt, jede mit eigener Dauer:
   `transition: transform 0.2s, background-color 0.4s;`
 - **Auslöser** sind alle Zustandswechsel: Pseudoklassen wie `:hover`, `:focus-visible`, `:active`, `:checked` – oder eine Klasse, die ein Skript setzt. Das Skript bewegt dabei nichts selbst; es schaltet nur den Zustand um.
@@ -97,25 +129,30 @@ Eine Animation besteht aus zwei Teilen: der **Beschreibung** des Ablaufs mit `@k
 }
 ```
 
-Fehlt `from` oder `to`, nimmt der Browser den normalen Zustand des Elements. Ein `@keyframes` mit nur `to { transform: rotate(360deg); }` dreht also vom aktuellen Zustand aus.
+Fehlt `from` oder `to`, nimmt der Browser dafür die Werte, die das Element ohne Animation hätte. Ein `@keyframes` mit nur `to { transform: rotate(360deg); }` dreht also vom aktuellen Zustand aus.
 
 ### Die Eigenschaften im Überblick
 
-| Eigenschaft | Bedeutung | Beispielwerte |
-|---|---|---|
-| `animation-name` | welche Keyframes | `einblenden` |
-| `animation-duration` | Dauer eines Durchlaufs | `0.5s`, `300ms` |
-| `animation-timing-function` | Tempoverlauf | `ease`, `linear`, `cubic-bezier(…)` |
-| `animation-delay` | Verzögerung vor dem Start; negativ = beginnt mittendrin | `1s`, `-0.5s` |
-| `animation-iteration-count` | Zahl der Durchläufe | `1`, `3`, `infinite` |
-| `animation-direction` | Richtung | `normal`, `reverse`, `alternate` |
-| `animation-fill-mode` | was vor und nach dem Ablauf gilt | `none`, `forwards`, `backwards`, `both` |
-| `animation-play-state` | läuft oder angehalten | `running`, `paused` |
+| Eigenschaft | Bedeutung | mögliche Werte | Voreinstellung |
+|---|---|---|---|
+| `animation-name` | welche Keyframes | Name eines `@keyframes`, `none` | `none` |
+| `animation-duration` | Dauer eines Durchlaufs | Zeit ab `0s`, z. B. `0.5s`, `300ms` | `0s` |
+| `animation-timing-function` | Tempoverlauf | dieselben Werte wie bei `transition-timing-function` (Abschnitt 3) | `ease` |
+| `animation-delay` | Verzögerung vor dem Start; negativ = beginnt sofort, aber mittendrin | Zeit, auch negativ, z. B. `1s`, `-0.5s` | `0s` |
+| `animation-iteration-count` | Zahl der Durchläufe | Zahl ab `0`, auch mit Komma, z. B. `3` oder `0.5` (endet mitten im Durchlauf); `infinite` | `1` |
+| `animation-direction` | Richtung | `normal`, `reverse`, `alternate`, `alternate-reverse` | `normal` |
+| `animation-fill-mode` | was vor und nach dem Ablauf gilt | `none`, `forwards`, `backwards`, `both` | `none` |
+| `animation-play-state` | läuft oder angehalten | `running`, `paused` | `running` |
+
+Alle Eigenschaften nehmen auch Listen mit Komma an, für mehrere Animationen am selben Element: `animation-name: wackeln, leuchten;`. Der Entwurf für Level 2 ergänzt weitere Eigenschaften, darunter `animation-composition` und `animation-timeline` (Abschnitt 11).
 
 Zwei, die oft übersehen werden:
 
-- **`animation-fill-mode`:** Ohne Angabe gilt eine Animation nur, solange sie läuft. Danach springt das Element in seinen normalen Zustand zurück. `forwards` hält den letzten Keyframe fest.
-- **`animation-direction: alternate`:** Jeder zweite Durchlauf läuft rückwärts – einschließlich der Timing-Funktion.
+- **`animation-fill-mode`:** Ohne Angabe wirkt eine Animation nur, solange sie läuft – nicht während der Verzögerung und nicht danach. Danach springt das Element in seinen normalen Zustand zurück.
+  - `forwards` hält den Zustand am Ende des letzten Durchlaufs fest. Das ist meist `100%`; bei `reverse` oder bei `alternate` mit gerader Zahl an Durchläufen aber `0%`.
+  - `backwards` zeigt schon während der Verzögerung den Zustand, mit dem der erste Durchlauf beginnt.
+  - `both` verbindet beides.
+- **`animation-direction`:** `reverse` spielt jeden Durchlauf rückwärts, `alternate` jeden zweiten, `alternate-reverse` beginnt rückwärts und wechselt dann ab. Rückwärts läuft auch die Timing-Funktion: Aus `ease-in` wird optisch `ease-out`.
 
 ### Kurzschreibweise
 
@@ -125,7 +162,12 @@ Zwei, die oft übersehen werden:
 }
 ```
 
-Die Reihenfolge ist weitgehend frei. Eine Regel gilt aber: **Die erste Zeitangabe ist die Dauer, die zweite die Verzögerung.**
+Die Reihenfolge ist weitgehend frei. Zwei Regeln gelten aber:
+
+- **Die erste Zeitangabe ist die Dauer, die zweite die Verzögerung.**
+- Ein Wort, das auch ein Wert einer anderen Eigenschaft sein kann (`linear`, `infinite`, `forwards` …), wird zuerst dieser Eigenschaft zugeordnet. Keyframes daher nicht so benennen.
+
+Quelle der Werte: [CSS Animations Level 1](https://www.w3.org/TR/css-animations-1/) (Working Draft, 2. März 2023), dazu [CSS Animations Level 2](https://drafts.csswg.org/css-animations-2/) (Editor’s Draft, 18. August 2026), abgerufen am 16.11.2026.
 
 
 ## 5 · Timing und Easing
@@ -311,10 +353,28 @@ CSS holt bei vielen der genannten Grenzen auf. Manches ist schon überall nutzba
 
 | Funktion | Wofür |
 |---|---|
-| `animation-timeline: scroll()` und `view()` | Fortschritt der Animation kommt vom Scrollen statt von der Uhr |
-| View Transitions | weiche Übergänge zwischen Zuständen einer Seite oder zwischen Seiten |
-| `@starting-style` und `transition-behavior: allow-discrete` | Einblenden von Elementen, die von `display: none` kommen, etwa Dialoge |
-| `interpolate-size` und `calc-size()` | `height: auto` direkt animieren |
+| `animation-timeline: scroll()` und `view()` | Der Fortschritt ist scrollbasiert statt zeitbasiert: `scroll()` folgt dem Scrollen eines Bereichs, `view()` dem Weg eines Elements durch den sichtbaren Bereich. Kein Auslöser – beim Zurückscrollen läuft die Animation rückwärts. Beispiel: Ein Balken zeigt den Lesefortschritt. |
+| View Transitions | Der Browser hält den alten Zustand einer Seite als Bild fest, baut den neuen auf und animiert dazwischen; ohne weitere Angaben blendet er über. Elemente mit gleichem `view-transition-name` gleiten an ihre neue Position und Größe. Beispiel: Ein Vorschaubild gleitet in die Detailseite. |
+| `@starting-style` und `transition-behavior: allow-discrete` | Ein Element, das gerade erst erscheint, etwa von `display: none`, hat keinen Ausgangszustand für eine Transition. `@starting-style` legt Startwerte fest, `allow-discrete` lässt auch `display` mitlaufen. Beispiel: Ein Dialog blendet beim Öffnen ein. |
+| `interpolate-size` und `calc-size()` | Übergänge zu und von `height: auto` und ähnlichen Schlüsselwörtern werden möglich. Beispiel: Ein Akkordeon klappt weich auf, ohne den Trick mit `grid-template-rows` (Szene 13). |
+
+**View Transitions genauer.** Es gibt zwei Fälle:
+
+- **Innerhalb einer Seite:** Ein Skript ändert den Inhalt in `document.startViewTransition(() => { … })`, etwa beim Filtern einer Liste oder beim Wechsel eines Tabs.
+- **Zwischen zwei Seiten:** ein gewöhnlicher Link-Klick. Beide Seiten schalten den Übergang per CSS ein. Soll ein Element vom alten auf den neuen Zustand gleiten, trägt es auf beiden Seiten denselben Namen; auf einer Seite darf ein Name nur einmal vorkommen.
+
+```css
+/* auf beiden Seiten */
+@view-transition {
+  navigation: auto;
+}
+
+/* Liste: Vorschaubild von Produkt 42 – Name je Produkt eindeutig */
+#produkt-42 .vorschaubild { view-transition-name: produkt-42; }
+
+/* Detailseite von Produkt 42: das große Bild */
+.produktbild { view-transition-name: produkt-42; }
+```
 
 Solche Funktionen setzt man als **Verbesserung** ein: Wo der Browser sie kann, wirken sie; wo nicht, funktioniert die Seite trotzdem. `@supports` prüft das:
 
@@ -347,22 +407,7 @@ Solche Funktionen setzt man als **Verbesserung** ein: Wo der Browser sie kann, w
 | `prefers-reduced-motion` | Media Query für die Einstellung „Bewegung reduzieren“ |
 
 
-## 13 · Fragen zur Wiederholung
-
-Eigene Übungsfragen, keine offiziellen Prüfungsaufgaben.
-
-1. Worin unterscheiden sich `transition` und `animation`? Nenne je einen typischen Einsatz.
-2. Warum steht eine Transition am Ausgangszustand und nicht am Zielzustand?
-3. Ein Element springt nach seiner Animation in die Ausgangslage zurück. Welche Eigenschaft ändert das, mit welchem Wert?
-4. Welches Easing passt zu einem Hinweis, der hereinfährt, welches zu einem, der verschwindet? Begründe.
-5. Warum sollte man `transform` statt `top` oder `width` animieren?
-6. Was bewirkt `transform-origin` bei einer Drehung?
-7. Eine Animation soll bei „Bewegung reduzieren“ nicht vollständig entfallen. Wie gehst du vor?
-8. Nenne zwei Situationen, in denen eine Bibliothek wie GSAP sinnvoller ist als reines CSS.
-9. Wie lässt sich eine neue CSS-Funktion einsetzen, ohne Browser auszuschließen, die sie noch nicht kennen?
-
-
-## 14 · Weiterführend
+## 13 · Weiterführend
 
 - MDN: [CSS-Animationen verwenden](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations), [CSS-Transitions verwenden](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions)
 - MDN: [Scroll-gesteuerte Animation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations), [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API), [`@starting-style`](https://developer.mozilla.org/en-US/docs/Web/CSS/@starting-style)

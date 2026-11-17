@@ -74,7 +74,7 @@
 
     /* 11 · Button: Hover, Klick, Fokus
        Drei Zustände, jeder mit eigener Rückmeldung.
-       Die transition steht beim Ausgangszustand und wirkt damit in beide Richtungen. */
+       Es gilt jeweils die transition des Zustands, in den gewechselt wird. */
 
     .knopf {
       /* mehrere Eigenschaften, jede mit eigener Dauer –
@@ -94,8 +94,9 @@
       transform: translateY(-3px);
     }
 
-    /* Klick: Der Button wird eingedrückt. Die kürzere Dauer gilt nur,
-       solange er gedrückt ist – so fühlt sich der Klick direkt an. */
+    /* Klick: Der Button wird eingedrückt. Die kurze Dauer gilt beim Wechsel
+       in :active, das Lösen nimmt die 0.2s der Grundregel – schnell hinein,
+       weicher zurück. So fühlt sich der Klick direkt an. */
     .knopf:active {
       transform: translateY(1px) scale(0.98);
       transition-duration: 0.05s;

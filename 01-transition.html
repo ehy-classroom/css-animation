@@ -66,8 +66,8 @@
        Ein Klick auf den Ball wechselt zwischen beiden Zuständen. */
 
     .ball {
-      /* Die transition steht beim Ausgangszustand.
-         So wirkt sie in beide Richtungen: beim Fallen und beim Steigen. */
+      /* Die transition steht in der Grundregel. Sie gilt damit auch,
+         solange .unten gesetzt ist: beim Fallen und beim Steigen gleich. */
       transition-property: transform;     /* welche Eigenschaft weich wechselt */
       transition-duration: 0.6s;          /* wie lange der Wechsel dauert */
       transition-timing-function: linear; /* Tempoverlauf: gleichmäßig, ohne Beschleunigung */
