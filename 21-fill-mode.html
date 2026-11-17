@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>21 · animation-fill-mode</title>
+
+  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <link rel="stylesheet" href="css/grundlayout.css">
+
+  <style>
+    /* Grundlayout (Seite, Bühne, Navigation, Codefenster, Steuerung)
+       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+
+
+    /*---------------------
+    TYPOGRAPHY
+    --------------------*/
+
+    .phasen {
+      font-size: 0.85em;
+    }
+
+    .bahn-name,
+    .marke {
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    .bahn-name {
+      font-size: 0.95em;
+    }
+
+    .marke {
+      font-size: 0.75em;
+    }
+
+
+    /*---------------------
+    COLORS
+    --------------------*/
+
+    /* Ausgangslage: der Ball, wie ihn sein eigenes CSS beschreibt – grau */
+    .ball {
+      background: #c9c6bd;
+    }
+
+    /* Hilfslinien: Bahn, Ausgangslage, from, to */
+    .bahn::before,
+    .hilfslinie {
+      background: #e3e1db;
+    }
+
+    .marke {
+      color: #8a8f98;
+    }
+
+    .bahn-name {
+      color: #1e1e1e;
+    }
+
+    /* Phasenanzeige: die aktive Phase ist dunkel hinterlegt */
+    .phasen li {
+      color: #8a8f98;
+      border-color: #e3e1db;
+    }
+
+    .vergleich[data-phase="warten"] li[data-p="warten"],
+    .vergleich[data-phase="laeuft"] li[data-p="laeuft"],
+    .vergleich[data-phase="ende"] li[data-p="ende"] {
+      background: #1e1e1e;
+      border-color: #1e1e1e;
+      color: #ffffff;
+    }
+
+
+    /*---------------------
+    LAYOUT
+    --------------------*/
+
+    /* Bezugsrahmen in Bühnengröße, mittig auf der UI-Bühne */
+    .vergleich {
+      position: relative;
+      width: 720px;
+      height: 480px;
+    }
+
+    /* Phasenanzeige oben */
+    .phasen {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .phasen li {
+      padding: 4px 12px;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 999px;
+    }
+
+    /* Senkrechte Hilfslinien durch alle Bahnen, mit Beschriftung darüber.
+       Mitte des Balls: Ausgangslage 180px, from 260px, to 620px */
+    .hilfslinie {
+      position: absolute;
+      top: 80px;
+      height: 270px;
+      width: 1px;
+    }
+
+    .hilfslinie.start { left: 180px; }
+    .hilfslinie.von   { left: 260px; }
+    .hilfslinie.bis   { left: 620px; }
+
+    .marke {
+      position: absolute;
+      top: 58px;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .marke.start { left: 180px; }
+    .marke.von   { left: 260px; }
+    .marke.bis   { left: 620px; }
+
+    /* Vier Bahnen untereinander, je eine pro Wert */
+    .bahn {
+      position: absolute;
+      left: 0;
+      width: 720px;
+      height: 40px;
+    }
+
+    .bahn.eins   { top: 90px; }
+    .bahn.zwei   { top: 160px; }
+    .bahn.drei   { top: 230px; }
+    .bahn.vier   { top: 300px; }
+
+    /* feine Linie, auf der der Ball läuft */
+    .bahn::before {
+      content: "";
+      position: absolute;
+      left: 160px;
+      right: 40px;
+      top: 20px;
+      height: 1px;
+    }
+
+    .bahn-name {
+      position: absolute;
+      left: 24px;
+      top: 10px;
+    }
+
+    .ball {
+      position: absolute;
+      left: 160px;           /* Ausgangslage */
+      top: 0;
+      z-index: 1;            /* vor den Hilfslinien */
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+
+    /*---------------------
+    ANIMATION
+    --------------------*/
+
+    /* 21 · animation-fill-mode
+       Was gilt vor dem Start (während der Verzögerung) und nach dem Ende?
+       Damit man es sieht, unterscheiden sich die Keyframes deutlich vom eigenen CSS des Balls:
+       Das eigene CSS ist grau und steht links (Ausgangslage),
+       die Keyframes sind orange und beginnen weiter rechts (from). */
+
+    @keyframes rollen {
+      from { transform: translateX(80px);  background: #e4572e; }
+      to   { transform: translateX(440px); background: #e4572e; }
+    }
+
+    /* Alle vier Bälle: gleiche Animation, 1 s Verzögerung, ein Durchlauf.
+       Die Animation läuft nur, solange .laeuft gesetzt ist; der Button setzt sie neu. */
+    .laeuft .ball {
+      animation-name: rollen;
+      animation-duration: 1.5s;
+      animation-timing-function: ease-in-out;
+      animation-delay: 1s;
+      animation-iteration-count: 1;
+    }
+
+    /* Der einzige Unterschied: animation-fill-mode */
+    .laeuft .ball.none      { animation-fill-mode: none; }       /* Voreinstellung */
+    .laeuft .ball.backwards { animation-fill-mode: backwards; }  /* from gilt schon während der Verzögerung */
+    .laeuft .ball.forwards  { animation-fill-mode: forwards; }   /* to bleibt nach dem Ende stehen */
+    .laeuft .ball.both      { animation-fill-mode: both; }       /* beides */
+
+    /* Hinweis: Ohne Verzögerung bewirkt backwards nichts, es gibt keine Wartezeit.
+       Bei infinite bewirkt forwards nichts, es gibt kein Ende.
+       Mit reverse oder alternate (gerade Zahl an Durchläufen) hält forwards den from-Zustand. */
+  </style>
+</head>
+<body>
+
+  <!-- Navigation: Übersicht, vorherige Szene -->
+  <nav class="navigation" aria-label="Szenen">
+    <a href="index.html" aria-label="Übersicht" title="Übersicht"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></a>
+    <div class="blaettern">
+      <a href="20-dashboard.html" rel="prev" aria-label="Vorherige Szene: 20 · Dashboard-Kacheln"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4 6 10l6 6"/></svg> 20</a>
+    </div>
+  </nav>
+
+  <main class="inhalt">
+    <div class="buehne ui">
+      <div class="vergleich laeuft" data-phase="warten">
+
+        <!-- Phasenanzeige: welcher Abschnitt gerade gilt -->
+        <ol class="phasen" aria-label="Phase">
+          <li data-p="warten">1 · Verzögerung, 1 s</li>
+          <li data-p="laeuft">2 · Ablauf, 1,5 s</li>
+          <li data-p="ende">3 · nach dem Ende</li>
+        </ol>
+
+        <!-- Hilfslinien: Ausgangslage aus dem eigenen CSS, Beginn und Ende der Keyframes -->
+        <span class="marke start">Ausgangslage</span>
+        <span class="marke von">from</span>
+        <span class="marke bis">to</span>
+        <div class="hilfslinie start"></div>
+        <div class="hilfslinie von"></div>
+        <div class="hilfslinie bis"></div>
+
+        <div class="bahn eins"><span class="bahn-name">none</span><div class="ball none"></div></div>
+        <div class="bahn zwei"><span class="bahn-name">backwards</span><div class="ball backwards"></div></div>
+        <div class="bahn drei"><span class="bahn-name">forwards</span><div class="ball forwards"></div></div>
+        <div class="bahn vier"><span class="bahn-name">both</span><div class="ball both"></div></div>
+      </div>
+
+      <!-- Steuerung: Ablauf neu starten -->
+      <div class="steuerung">
+        <button type="button" class="knopf-neu">Neu starten</button>
+      </div>
+    </div>
+
+    <section class="beschreibung">
+      <h1>21 · animation-fill-mode</h1>
+      <h2>Was passiert</h2>
+      <p>Vier Bälle, dieselbe Animation: eine Sekunde warten, dann in 1,5 Sekunden von <code>from</code> nach <code>to</code> rollen, ein Durchlauf. Grau steht der Ball, wie ihn sein eigenes CSS beschreibt, orange zeigen ihn die Keyframes. Der einzige Unterschied ist <code>animation-fill-mode</code>.</p>
+      <h2>Was man sieht</h2>
+      <p><code>none</code>: wartet grau in der Ausgangslage, springt beim Start nach <code>from</code> und am Ende zurück in die Ausgangslage. <code>backwards</code>: steht schon während der Verzögerung orange auf <code>from</code>, springt am Ende zurück. <code>forwards</code>: wartet grau, bleibt am Ende orange auf <code>to</code> stehen. <code>both</code>: kein Sprung, weder am Anfang noch am Ende.</p>
+      <h2>Gut zu wissen</h2>
+      <p><code>backwards</code> wirkt nur mit Verzögerung, <code>forwards</code> nur, wenn die Animation endet (nicht bei <code>infinite</code>). Welcher Keyframe stehen bleibt, hängt von der Richtung ab: bei <code>reverse</code> oder bei <code>alternate</code> mit gerader Zahl an Durchläufen ist es <code>from</code>. Der gehaltene Zustand kommt weiter aus der Animation: Wird sie entfernt, gilt wieder das eigene CSS.</p>
+    </section>
+
+    <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
+    <aside class="code" aria-label="Codeausschnitt">
+      <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="code-teil">
+        <h3>CSS</h3>
+<pre><code><span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">left</span>: <span class="c-wert">160px</span>;           <span class="c-kommentar">/* Ausgangslage */</span>
+  <span class="c-eigenschaft">background</span>: <span class="c-wert">#c9c6bd</span>;   <span class="c-kommentar">/* grau */</span>
+}
+
+<span class="c-at">@keyframes</span> rollen {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateX(80px)</span>;  <span class="c-eigenschaft">background</span>: <span class="c-wert">#e4572e</span>; }
+  <span class="c-selektor">to</span>   { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateX(440px)</span>; <span class="c-eigenschaft">background</span>: <span class="c-wert">#e4572e</span>; }
+}
+
+<span class="c-selektor">.ball</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">rollen 1.5s ease-in-out 1s</span>;
+}
+
+<span class="c-selektor">.ball.none</span>      { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">none</span>; }
+<span class="c-selektor">.ball.backwards</span> { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">backwards</span>; }
+<span class="c-selektor">.ball.forwards</span>  { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">forwards</span>; }
+<span class="c-selektor">.ball.both</span>      { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">both</span>; }</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>JavaScript</h3>
+<pre><code><span class="c-kommentar">// Neu starten: Klasse entfernen, Layout erzwingen, Klasse wieder setzen</span>
+vergleich.classList.remove(<span class="c-wert">'laeuft'</span>);
+<span class="c-at">void</span> vergleich.offsetWidth;
+vergleich.classList.add(<span class="c-wert">'laeuft'</span>);</code></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const vergleich = document.querySelector('.vergleich');
+    const bezug = document.querySelector('.ball.both');   // ein Ball genügt für die Phasenanzeige
+    const knopfNeu = document.querySelector('.knopf-neu');
+
+    // Phasenanzeige: animationstart kommt nach der Verzögerung, animationend am Ende
+    bezug.addEventListener('animationstart', () => { vergleich.dataset.phase = 'laeuft'; });
+    bezug.addEventListener('animationend', () => { vergleich.dataset.phase = 'ende'; });
+
+    // Neu starten: Ohne das erzwungene Layout (offsetWidth) würde der Browser
+    // Entfernen und Setzen zusammenfassen, und nichts startet neu.
+    knopfNeu.addEventListener('click', () => {
+      vergleich.classList.remove('laeuft');
+      void vergleich.offsetWidth;
+      vergleich.dataset.phase = 'warten';
+      vergleich.classList.add('laeuft');
+    });
+  </script>
+
+</body>
+</html>

@@ -152,6 +152,7 @@ Zwei, die oft übersehen werden:
   - `forwards` hält den Zustand am Ende des letzten Durchlaufs fest. Das ist meist `100%`; bei `reverse` oder bei `alternate` mit gerader Zahl an Durchläufen aber `0%`.
   - `backwards` zeigt schon während der Verzögerung den Zustand, mit dem der erste Durchlauf beginnt.
   - `both` verbindet beides.
+  - Alle vier Werte nebeneinander: Szene 21.
 - **`animation-direction`:** `reverse` spielt jeden Durchlauf rückwärts, `alternate` jeden zweiten, `alternate-reverse` beginnt rückwärts und wechselt dann ab. Rückwärts läuft auch die Timing-Funktion: Aus `ease-in` wird optisch `ease-out`.
 
 ### Kurzschreibweise
@@ -419,4 +420,4 @@ Solche Funktionen setzt man als **Verbesserung** ein: Wo der Browser sie kann, w
 
 ## Beispiele
 
-Zu allen Themen gibt es Beispiele zum Ausprobieren: `index.html` im Browser öffnen. Zwei Serien mit je zehn Szenen – ein springender Ball für die Grundlagen, typische Oberflächenelemente für die Praxis.
+Zu allen Themen gibt es Beispiele zum Ausprobieren: `index.html` im Browser öffnen. Zwei Serien mit je zehn Szenen – ein springender Ball für die Grundlagen, typische Oberflächenelemente für die Praxis. Dazu Serie 3 mit einzelnen Beispielen, die eine Eigenschaft genauer zeigen, etwa `animation-fill-mode` (Szene 21).
