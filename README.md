@@ -152,7 +152,7 @@ Zwei, die oft übersehen werden:
   - `forwards` hält den Zustand am Ende des letzten Durchlaufs fest. Das ist meist `100%`; bei `reverse` oder bei `alternate` mit gerader Zahl an Durchläufen aber `0%`.
   - `backwards` zeigt schon während der Verzögerung den Zustand, mit dem der erste Durchlauf beginnt.
   - `both` verbindet beides.
-  - Alle vier Werte nebeneinander: Szene 21.
+  - Drei Fälle aus einer Oberfläche, je ohne und mit dem passenden Wert: Szene 21.
 - **`animation-direction`:** `reverse` spielt jeden Durchlauf rückwärts, `alternate` jeden zweiten, `alternate-reverse` beginnt rückwärts und wechselt dann ab. Rückwärts läuft auch die Timing-Funktion: Aus `ease-in` wird optisch `ease-out`.
 
 ### Kurzschreibweise

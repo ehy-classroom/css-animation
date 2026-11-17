@@ -5,33 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>21 · animation-fill-mode</title>
 
-  <!-- Grundlayout: Seite, Bühne, Horizont, Navigation, Codefenster -->
+  <!-- Grundlayout: Seite, Bühne, Navigation, Codefenster, Steuerung -->
   <link rel="stylesheet" href="css/grundlayout.css">
 
   <style>
     /* Grundlayout (Seite, Bühne, Navigation, Codefenster, Steuerung)
-       steht in css/grundlayout.css. Hier steht nur, was sich bewegt, und die Bewegung. */
+       steht in css/grundlayout.css. Hier steht nur, was zu dieser Szene gehört, und die Bewegung. */
 
 
     /*---------------------
     TYPOGRAPHY
     --------------------*/
 
-    .phasen {
-      font-size: 0.85em;
+    .haelfte-titel {
+      font-size: 0.8em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    .bahn-name,
-    .marke {
+    .haelfte-titel code {
       font-family: ui-monospace, Menlo, monospace;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
-    .bahn-name {
-      font-size: 0.95em;
+    .kachel-etikett {
+      font-size: 0.7em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    .marke {
-      font-size: 0.75em;
+    .kachel-zahl {
+      font-size: 1.2em;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .formular-titel,
+    .hinweis-titel,
+    .gespeichert {
+      font-weight: 600;
+    }
+
+    .hinweis-text {
+      font-size: 0.9em;
     }
 
 
@@ -39,36 +56,43 @@
     COLORS
     --------------------*/
 
-    /* Ausgangslage: der Ball, wie ihn sein eigenes CSS beschreibt – grau */
-    .ball {
-      background: #c9c6bd;
+    .haelfte-titel {
+      color: #757575;
     }
 
-    /* Hilfslinien: Bahn, Ausgangslage, from, to */
-    .bahn::before,
-    .hilfslinie {
-      background: #e3e1db;
+    .haelfte.mit .haelfte-titel {
+      color: #e4572e;
     }
 
-    .marke {
-      color: #8a8f98;
+    .kachel,
+    .formular,
+    .leiste {
+      background: #f4f3ef;
     }
 
-    .bahn-name {
-      color: #1e1e1e;
+    .kachel-etikett {
+      color: #757575;
     }
 
-    /* Phasenanzeige: die aktive Phase ist dunkel hinterlegt */
-    .phasen li {
-      color: #8a8f98;
-      border-color: #e3e1db;
+    .feld {
+      background: #ffffff;
+      border-color: #d9d6cf;
     }
 
-    .vergleich[data-phase="warten"] li[data-p="warten"],
-    .vergleich[data-phase="laeuft"] li[data-p="laeuft"],
-    .vergleich[data-phase="ende"] li[data-p="ende"] {
+    .gespeichert,
+    .hinweis {
       background: #1e1e1e;
-      border-color: #1e1e1e;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(30, 30, 30, 0.25);
+    }
+
+    .hinweis-text {
+      color: #d9d9d9;
+    }
+
+    /* Auswahl des Falls: gedrückter Button dunkel */
+    .steuerung button[aria-pressed="true"] {
+      background: #1e1e1e;
       color: #ffffff;
     }
 
@@ -77,95 +101,115 @@
     LAYOUT
     --------------------*/
 
-    /* Bezugsrahmen in Bühnengröße, mittig auf der UI-Bühne */
-    .vergleich {
-      position: relative;
-      width: 720px;
-      height: 480px;
+    /* Zwei Hälften: links ohne, rechts mit animation-fill-mode.
+       Jede Hälfte schneidet ab, was hinausfährt. */
+    .haelfte {
+      position: absolute;
+      top: 0;
+      width: 360px;
+      height: 400px;
+      overflow: hidden;
     }
 
-    /* Phasenanzeige oben */
-    .phasen {
+    .haelfte.ohne { left: 0; }
+    .haelfte.mit  { left: 360px; }
+
+    .haelfte-titel {
       position: absolute;
-      top: 16px;
+      top: 20px;
       left: 0;
       right: 0;
       margin: 0;
-      padding: 0;
-      list-style: none;
-      display: flex;
-      justify-content: center;
-      gap: 8px;
+      text-align: center;
     }
 
-    .phasen li {
-      padding: 4px 12px;
-      border-style: solid;
-      border-width: 1px;
-      border-radius: 999px;
+    /* Nur der gewählte Fall ist zu sehen: data-fall an der Bühne */
+    .fall {
+      display: none;
     }
 
-    /* Senkrechte Hilfslinien durch alle Bahnen, mit Beschriftung darüber.
-       Mitte des Balls: Ausgangslage 180px, from 260px, to 620px */
-    .hilfslinie {
+    .buehne[data-fall="1"] .fall-1,
+    .buehne[data-fall="2"] .fall-2,
+    .buehne[data-fall="3"] .fall-3 {
+      display: block;
+    }
+
+    .buehne[data-fall="1"] .haelfte-titel .fall-1,
+    .buehne[data-fall="2"] .haelfte-titel .fall-2,
+    .buehne[data-fall="3"] .haelfte-titel .fall-3 {
+      display: inline;
+    }
+
+    /* Fall 1: sechs Kacheln in zwei Reihen */
+    .kacheln {
       position: absolute;
       top: 80px;
-      height: 270px;
-      width: 1px;
-    }
-
-    .hilfslinie.start { left: 180px; }
-    .hilfslinie.von   { left: 260px; }
-    .hilfslinie.bis   { left: 620px; }
-
-    .marke {
-      position: absolute;
-      top: 58px;
-      transform: translateX(-50%);
-      white-space: nowrap;
-    }
-
-    .marke.start { left: 180px; }
-    .marke.von   { left: 260px; }
-    .marke.bis   { left: 620px; }
-
-    /* Vier Bahnen untereinander, je eine pro Wert */
-    .bahn {
-      position: absolute;
-      left: 0;
-      width: 720px;
-      height: 40px;
-    }
-
-    .bahn.eins   { top: 90px; }
-    .bahn.zwei   { top: 160px; }
-    .bahn.drei   { top: 230px; }
-    .bahn.vier   { top: 300px; }
-
-    /* feine Linie, auf der der Ball läuft */
-    .bahn::before {
-      content: "";
-      position: absolute;
-      left: 160px;
-      right: 40px;
-      top: 20px;
-      height: 1px;
-    }
-
-    .bahn-name {
-      position: absolute;
       left: 24px;
-      top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 96px);
+      gap: 12px;
     }
 
-    .ball {
+    .kachel {
+      display: grid;
+      gap: 0.2em;
+      height: 64px;
+      padding: 0.7em 0.8em;
+      box-sizing: border-box;
+      border-radius: 0.5em;
+    }
+
+    /* Fall 2: Formular, darunter die Meldung */
+    .formular {
       position: absolute;
-      left: 160px;           /* Ausgangslage */
-      top: 0;
-      z-index: 1;            /* vor den Hilfslinien */
-      width: 40px;
+      top: 80px;
+      left: 40px;
+      width: 280px;
+      display: grid;
+      gap: 10px;
+      padding: 1em;
+      box-sizing: border-box;
+      border-radius: 0.6em;
+    }
+
+    .feld {
+      height: 28px;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 4px;
+    }
+
+    .gespeichert {
+      position: absolute;
+      top: 270px;
+      left: 90px;
+      width: 180px;
+      padding: 0.7em 1em;
+      box-sizing: border-box;
+      border-radius: 0.6em;
+      text-align: center;
+    }
+
+    /* Fall 3: Kopfleiste, rechts darunter der Hinweis */
+    .leiste {
+      position: absolute;
+      top: 64px;
+      left: 16px;
+      right: 16px;
       height: 40px;
-      border-radius: 50%;
+      border-radius: 0.5em;
+    }
+
+    .hinweis {
+      position: absolute;
+      top: 120px;
+      right: 16px;
+      width: 230px;
+      display: grid;
+      gap: 0.2em;
+      padding: 0.9em 1.1em;
+      box-sizing: border-box;
+      border-radius: 0.6em;
     }
 
 
@@ -174,35 +218,70 @@
     --------------------*/
 
     /* 21 · animation-fill-mode
-       Was gilt vor dem Start (während der Verzögerung) und nach dem Ende?
-       Damit man es sieht, unterscheiden sich die Keyframes deutlich vom eigenen CSS des Balls:
-       Das eigene CSS ist grau und steht links (Ausgangslage),
-       die Keyframes sind orange und beginnen weiter rechts (from). */
+       Eine Animation wirkt nur, solange sie läuft – nicht während der Verzögerung und nicht danach.
+       Davor und danach gilt das eigene CSS des Elements.
+       Drei Fälle aus einer Oberfläche, jeweils links ohne und rechts mit dem passenden Wert.
+       Die Klasse .laeuft an der Bühne weist die Animationen zu; der Button „Abspielen“ setzt sie. */
 
-    @keyframes rollen {
-      from { transform: translateX(80px);  background: #e4572e; }
-      to   { transform: translateX(440px); background: #e4572e; }
+
+    /* Fall 1 · Kacheln erscheinen nacheinander → backwards
+       Die Keyframes haben nur from: Das Ziel ist das eigene CSS (sichtbar).
+       Ohne backwards ist jede Kachel in ihrer Wartezeit sichtbar,
+       verschwindet beim Start schlagartig und blendet dann ein. */
+    @keyframes einblenden {
+      from { opacity: 0; transform: translateY(0.8em); }
     }
 
-    /* Alle vier Bälle: gleiche Animation, 1 s Verzögerung, ein Durchlauf.
-       Die Animation läuft nur, solange .laeuft gesetzt ist; der Button setzt sie neu. */
-    .laeuft .ball {
-      animation-name: rollen;
-      animation-duration: 1.5s;
-      animation-timing-function: ease-in-out;
-      animation-delay: 1s;
-      animation-iteration-count: 1;
+    .laeuft .kachel {
+      animation: einblenden 0.5s ease-out;
+      animation-delay: calc(0.5s + var(--i) * 0.35s);   /* --i aus dem HTML */
     }
 
-    /* Der einzige Unterschied: animation-fill-mode */
-    .laeuft .ball.none      { animation-fill-mode: none; }       /* Voreinstellung */
-    .laeuft .ball.backwards { animation-fill-mode: backwards; }  /* from gilt schon während der Verzögerung */
-    .laeuft .ball.forwards  { animation-fill-mode: forwards; }   /* to bleibt nach dem Ende stehen */
-    .laeuft .ball.both      { animation-fill-mode: both; }       /* beides */
+    .laeuft .mit .kachel {
+      animation-fill-mode: backwards;   /* Wartezeit: schon unsichtbar wie from */
+    }
 
-    /* Hinweis: Ohne Verzögerung bewirkt backwards nichts, es gibt keine Wartezeit.
-       Bei infinite bewirkt forwards nichts, es gibt kein Ende.
-       Mit reverse oder alternate (gerade Zahl an Durchläufen) hält forwards den from-Zustand. */
+
+    /* Fall 2 · Meldung verschwindet → forwards
+       Die Keyframes haben nur to: Der Anfang ist das eigene CSS (sichtbar).
+       Ohne forwards blendet die Meldung aus – und steht danach wieder da. */
+    @keyframes ausblenden {
+      to { opacity: 0; transform: translateY(0.6em); }
+    }
+
+    .laeuft .gespeichert {
+      animation: ausblenden 0.5s ease-in 1.5s;
+    }
+
+    .laeuft .mit .gespeichert {
+      animation-fill-mode: forwards;    /* nach dem Ende: bleibt unsichtbar wie to */
+    }
+
+
+    /* Fall 3 · Hinweis kommt verzögert, steht und geht → both
+       Das eigene CSS zeigt den Hinweis sichtbar an seinem Platz:
+       So bleibt er lesbar, wenn die Animation nicht läuft.
+       Die Keyframes beginnen und enden außerhalb.
+       Ohne both ist er in der Wartezeit sichtbar und nach dem Ende wieder da. */
+    @keyframes kommen-und-gehen {
+      0%   { transform: translateX(calc(100% + 24px)); opacity: 0;
+             animation-timing-function: ease-out; }
+      15%  { transform: translateX(0); opacity: 1; }
+      85%  { transform: translateX(0); opacity: 1;
+             animation-timing-function: ease-in; }
+      100% { transform: translateX(calc(100% + 24px)); opacity: 0; }
+    }
+
+    .laeuft .hinweis {
+      animation: kommen-und-gehen 3s 1.5s;
+    }
+
+    .laeuft .mit .hinweis {
+      animation-fill-mode: both;        /* davor wie 0 %, danach wie 100 % */
+    }
+
+    /* none, die Voreinstellung, ist richtig für alles, was endlos läuft
+       oder ohnehin im eigenen CSS endet: Ladeanzeige, wackelnde Glocke. */
   </style>
 </head>
 <body>
@@ -216,96 +295,136 @@
   </nav>
 
   <main class="inhalt">
-    <div class="buehne ui">
-      <div class="vergleich laeuft" data-phase="warten">
+    <div class="buehne ui geteilt" data-fall="1">
 
-        <!-- Phasenanzeige: welcher Abschnitt gerade gilt -->
-        <ol class="phasen" aria-label="Phase">
-          <li data-p="warten">1 · Verzögerung, 1 s</li>
-          <li data-p="laeuft">2 · Ablauf, 1,5 s</li>
-          <li data-p="ende">3 · nach dem Ende</li>
-        </ol>
+      <!-- Beide Hälften enthalten dieselben drei Fälle; zu sehen ist der gewählte -->
+      <div class="haelfte ohne">
+        <p class="haelfte-titel">ohne <code>animation-fill-mode</code></p>
 
-        <!-- Hilfslinien: Ausgangslage aus dem eigenen CSS, Beginn und Ende der Keyframes -->
-        <span class="marke start">Ausgangslage</span>
-        <span class="marke von">from</span>
-        <span class="marke bis">to</span>
-        <div class="hilfslinie start"></div>
-        <div class="hilfslinie von"></div>
-        <div class="hilfslinie bis"></div>
+        <div class="fall fall-1">
+          <div class="kacheln">
+            <div class="kachel" style="--i: 0"><span class="kachel-etikett">Besuche</span><span class="kachel-zahl">12.480</span></div>
+            <div class="kachel" style="--i: 1"><span class="kachel-etikett">Käufe</span><span class="kachel-zahl">424</span></div>
+            <div class="kachel" style="--i: 2"><span class="kachel-etikett">Umsatz</span><span class="kachel-zahl">8,9 T</span></div>
+            <div class="kachel" style="--i: 3"><span class="kachel-etikett">Neu</span><span class="kachel-zahl">96</span></div>
+            <div class="kachel" style="--i: 4"><span class="kachel-etikett">Retouren</span><span class="kachel-zahl">2,1 %</span></div>
+            <div class="kachel" style="--i: 5"><span class="kachel-etikett">Quote</span><span class="kachel-zahl">3,4 %</span></div>
+          </div>
+        </div>
 
-        <div class="bahn eins"><span class="bahn-name">none</span><div class="ball none"></div></div>
-        <div class="bahn zwei"><span class="bahn-name">backwards</span><div class="ball backwards"></div></div>
-        <div class="bahn drei"><span class="bahn-name">forwards</span><div class="ball forwards"></div></div>
-        <div class="bahn vier"><span class="bahn-name">both</span><div class="ball both"></div></div>
+        <div class="fall fall-2">
+          <div class="formular"><span class="formular-titel">Profil</span><div class="feld"></div><div class="feld"></div><div class="feld"></div></div>
+          <div class="gespeichert">✓ Gespeichert</div>
+        </div>
+
+        <div class="fall fall-3">
+          <div class="leiste"></div>
+          <div class="hinweis"><span class="hinweis-titel">Neue Version verfügbar</span><span class="hinweis-text">Zum Aktualisieren neu laden.</span></div>
+        </div>
       </div>
 
-      <!-- Steuerung: Ablauf neu starten -->
+      <div class="haelfte mit">
+        <p class="haelfte-titel">mit <code><span class="fall fall-1">backwards</span><span class="fall fall-2">forwards</span><span class="fall fall-3">both</span></code></p>
+
+        <div class="fall fall-1">
+          <div class="kacheln">
+            <div class="kachel" style="--i: 0"><span class="kachel-etikett">Besuche</span><span class="kachel-zahl">12.480</span></div>
+            <div class="kachel" style="--i: 1"><span class="kachel-etikett">Käufe</span><span class="kachel-zahl">424</span></div>
+            <div class="kachel" style="--i: 2"><span class="kachel-etikett">Umsatz</span><span class="kachel-zahl">8,9 T</span></div>
+            <div class="kachel" style="--i: 3"><span class="kachel-etikett">Neu</span><span class="kachel-zahl">96</span></div>
+            <div class="kachel" style="--i: 4"><span class="kachel-etikett">Retouren</span><span class="kachel-zahl">2,1 %</span></div>
+            <div class="kachel" style="--i: 5"><span class="kachel-etikett">Quote</span><span class="kachel-zahl">3,4 %</span></div>
+          </div>
+        </div>
+
+        <div class="fall fall-2">
+          <div class="formular"><span class="formular-titel">Profil</span><div class="feld"></div><div class="feld"></div><div class="feld"></div></div>
+          <div class="gespeichert">✓ Gespeichert</div>
+        </div>
+
+        <div class="fall fall-3">
+          <div class="leiste"></div>
+          <div class="hinweis"><span class="hinweis-titel">Neue Version verfügbar</span><span class="hinweis-text">Zum Aktualisieren neu laden.</span></div>
+        </div>
+      </div>
+
+      <!-- Steuerung: Fall wählen, dann abspielen -->
       <div class="steuerung">
-        <button type="button" class="knopf-neu">Neu starten</button>
+        <button type="button" class="knopf-fall" data-fall="1" aria-pressed="true">1 · Kacheln</button>
+        <button type="button" class="knopf-fall" data-fall="2" aria-pressed="false">2 · Gespeichert</button>
+        <button type="button" class="knopf-fall" data-fall="3" aria-pressed="false">3 · Neue Version</button>
+        <button type="button" class="knopf-start">Abspielen</button>
       </div>
     </div>
 
     <section class="beschreibung">
       <h1>21 · animation-fill-mode</h1>
-      <h2>Was passiert</h2>
-      <p>Vier Bälle, dieselbe Animation: eine Sekunde warten, dann in 1,5 Sekunden von <code>from</code> nach <code>to</code> rollen, ein Durchlauf. Grau steht der Ball, wie ihn sein eigenes CSS beschreibt, orange zeigen ihn die Keyframes. Der einzige Unterschied ist <code>animation-fill-mode</code>.</p>
-      <h2>Was man sieht</h2>
-      <p><code>none</code>: wartet grau in der Ausgangslage, springt beim Start nach <code>from</code> und am Ende zurück in die Ausgangslage. <code>backwards</code>: steht schon während der Verzögerung orange auf <code>from</code>, springt am Ende zurück. <code>forwards</code>: wartet grau, bleibt am Ende orange auf <code>to</code> stehen. <code>both</code>: kein Sprung, weder am Anfang noch am Ende.</p>
-      <h2>Gut zu wissen</h2>
-      <p><code>backwards</code> wirkt nur mit Verzögerung, <code>forwards</code> nur, wenn die Animation endet (nicht bei <code>infinite</code>). Welcher Keyframe stehen bleibt, hängt von der Richtung ab: bei <code>reverse</code> oder bei <code>alternate</code> mit gerader Zahl an Durchläufen ist es <code>from</code>. Der gehaltene Zustand kommt weiter aus der Animation: Wird sie entfernt, gilt wieder das eigene CSS.</p>
+      <h2>Worum es geht</h2>
+      <p>Eine Animation wirkt nur, solange sie läuft – nicht während der Verzögerung und nicht danach. Davor und danach gilt das eigene CSS des Elements. Unterscheiden sich eigenes CSS und Keyframes, springt das Element. <code>backwards</code> füllt die Wartezeit mit dem ersten Keyframe, <code>forwards</code> hält den letzten fest, <code>both</code> macht beides.</p>
+      <h2>Drei Fälle</h2>
+      <p><strong>1 · Kacheln</strong> erscheinen nacheinander. Ohne <code>backwards</code> sind sie in ihrer Wartezeit schon da, verschwinden beim Start und blenden dann ein.</p>
+      <p><strong>2 · Gespeichert</strong> blendet nach 1,5 s aus. Ohne <code>forwards</code> steht die Meldung danach wieder da.</p>
+      <p><strong>3 · Neue Version</strong> fährt nach 1,5 s herein, steht kurz und fährt wieder hinaus. Ohne <code>both</code> ist der Hinweis in der Wartezeit sichtbar und am Ende wieder da.</p>
+      <h2>Und none?</h2>
+      <p>Die Voreinstellung ist richtig für alles, was endlos läuft oder ohnehin im eigenen CSS endet: Ladeanzeige, wackelnde Glocke.</p>
     </section>
 
     <!-- Codefenster: die entscheidenden Stellen dieser Datei, zum Mitlesen -->
     <aside class="code" aria-label="Codeausschnitt">
       <div class="code-kopf" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="code-teil">
-        <h3>CSS</h3>
-<pre><code><span class="c-selektor">.ball</span> {
-  <span class="c-eigenschaft">left</span>: <span class="c-wert">160px</span>;           <span class="c-kommentar">/* Ausgangslage */</span>
-  <span class="c-eigenschaft">background</span>: <span class="c-wert">#c9c6bd</span>;   <span class="c-kommentar">/* grau */</span>
+        <h3>1 · backwards</h3>
+<pre><code><span class="c-at">@keyframes</span> einblenden {
+  <span class="c-selektor">from</span> { <span class="c-eigenschaft">opacity</span>: <span class="c-wert">0</span>; }
 }
-
-<span class="c-at">@keyframes</span> rollen {
-  <span class="c-selektor">from</span> { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateX(80px)</span>;  <span class="c-eigenschaft">background</span>: <span class="c-wert">#e4572e</span>; }
-  <span class="c-selektor">to</span>   { <span class="c-eigenschaft">transform</span>: <span class="c-wert">translateX(440px)</span>; <span class="c-eigenschaft">background</span>: <span class="c-wert">#e4572e</span>; }
-}
-
-<span class="c-selektor">.ball</span> {
-  <span class="c-eigenschaft">animation</span>: <span class="c-wert">rollen 1.5s ease-in-out 1s</span>;
-}
-
-<span class="c-selektor">.ball.none</span>      { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">none</span>; }
-<span class="c-selektor">.ball.backwards</span> { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">backwards</span>; }
-<span class="c-selektor">.ball.forwards</span>  { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">forwards</span>; }
-<span class="c-selektor">.ball.both</span>      { <span class="c-eigenschaft">animation-fill-mode</span>: <span class="c-wert">both</span>; }</code></pre>
+<span class="c-selektor">.kachel</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">einblenden 0.5s ease-out backwards</span>;
+  <span class="c-eigenschaft">animation-delay</span>: <span class="c-wert">calc(0.5s + var(--i) * 0.35s)</span>;
+}</code></pre>
       </div>
       <div class="code-teil">
-        <h3>JavaScript</h3>
-<pre><code><span class="c-kommentar">// Neu starten: Klasse entfernen, Layout erzwingen, Klasse wieder setzen</span>
-vergleich.classList.remove(<span class="c-wert">'laeuft'</span>);
-<span class="c-at">void</span> vergleich.offsetWidth;
-vergleich.classList.add(<span class="c-wert">'laeuft'</span>);</code></pre>
+        <h3>2 · forwards</h3>
+<pre><code><span class="c-at">@keyframes</span> ausblenden {
+  <span class="c-selektor">to</span> { <span class="c-eigenschaft">opacity</span>: <span class="c-wert">0</span>; }
+}
+<span class="c-selektor">.gespeichert</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">ausblenden 0.5s ease-in 1.5s forwards</span>;
+}</code></pre>
+      </div>
+      <div class="code-teil">
+        <h3>3 · both</h3>
+<pre><code><span class="c-kommentar">/* eigenes CSS: sichtbar am Platz;
+   Keyframes beginnen und enden außerhalb */</span>
+<span class="c-selektor">.hinweis</span> {
+  <span class="c-eigenschaft">animation</span>: <span class="c-wert">kommen-und-gehen 3s 1.5s both</span>;
+}</code></pre>
       </div>
     </aside>
   </main>
 
   <script>
-    const vergleich = document.querySelector('.vergleich');
-    const bezug = document.querySelector('.ball.both');   // ein Ball genügt für die Phasenanzeige
-    const knopfNeu = document.querySelector('.knopf-neu');
+    const buehne = document.querySelector('.buehne');
+    const knopfStart = document.querySelector('.knopf-start');
+    const knoepfeFall = document.querySelectorAll('.knopf-fall');
 
-    // Phasenanzeige: animationstart kommt nach der Verzögerung, animationend am Ende
-    bezug.addEventListener('animationstart', () => { vergleich.dataset.phase = 'laeuft'; });
-    bezug.addEventListener('animationend', () => { vergleich.dataset.phase = 'ende'; });
+    // Fall wählen: Animation zurücksetzen, damit das eigene CSS zu sehen ist
+    knoepfeFall.forEach(knopf => {
+      knopf.addEventListener('click', () => {
+        buehne.classList.remove('laeuft');
+        buehne.dataset.fall = knopf.dataset.fall;
+        knoepfeFall.forEach(k => k.setAttribute('aria-pressed', String(k === knopf)));
+        knopfStart.textContent = 'Abspielen';
+      });
+    });
 
-    // Neu starten: Ohne das erzwungene Layout (offsetWidth) würde der Browser
-    // Entfernen und Setzen zusammenfassen, und nichts startet neu.
-    knopfNeu.addEventListener('click', () => {
-      vergleich.classList.remove('laeuft');
-      void vergleich.offsetWidth;
-      vergleich.dataset.phase = 'warten';
-      vergleich.classList.add('laeuft');
+    // Abspielen: Klasse entfernen, Layout erzwingen, Klasse wieder setzen.
+    // Ohne das erzwungene Layout (offsetWidth) würde der Browser
+    // Entfernen und Setzen zusammenfassen, und beim zweiten Mal startet nichts neu.
+    knopfStart.addEventListener('click', () => {
+      buehne.classList.remove('laeuft');
+      void buehne.offsetWidth;
+      buehne.classList.add('laeuft');
+      knopfStart.textContent = 'Noch einmal';
     });
   </script>
 
